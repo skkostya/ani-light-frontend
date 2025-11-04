@@ -46,9 +46,11 @@ export const AnimeCard: React.FC<AnimeCardProps> = ({
   variant = 'default'
 }) => {
   const { t } = useTranslation();
-  const { ref, isIntersecting } = useIntersectionObserver({
-    freezeOnceVisible: true
-  });
+  const [ref, isIntersecting] = useIntersectionObserver();
+  const { ref: imageRef, isIntersecting: imageIsIntersecting } =
+    useIntersectionObserver({
+      freezeOnceVisible: true
+    });
 
   const handleFavoriteClick = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -81,10 +83,13 @@ export const AnimeCard: React.FC<AnimeCardProps> = ({
       ref={ref}
       to={ROUTES.animeEpisodes(anime.alias)}
       className={styles.animeCard}
+      style={{
+        contentVisibility: isIntersecting ? 'visible' : 'hidden'
+      }}
     >
       <Card sx={cardStyle}>
-        <Box sx={imageContainerStyle}>
-          {isIntersecting && (
+        <Box ref={imageRef} sx={imageContainerStyle}>
+          {imageIsIntersecting && (
             <ImageWithFallback
               src={anime.imageUrl}
               alt={anime.title}

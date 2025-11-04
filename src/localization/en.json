@@ -318,5 +318,7 @@
   "login_no_account": "Don't have an account?",
   "login_register_link": "Sign Up",
   "register_has_account": "Already have an account?",
-  "register_login_link": "Sign In"
+  "register_login_link": "Sign In",
+  "login_continue_without_auth": "Continue browsing without login or registration",
+  "register_continue_without_auth": "Continue browsing without login or registration"
 }

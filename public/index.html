@@ -11,8 +11,27 @@
     <title>AniLight</title>
     <script>
       // Раннее применение темы для предотвращения мигания
+      // Приоритет: Cookie > localStorage > Системная тема
       (function () {
         try {
+          // Функция для чтения cookie
+          function getCookie(name) {
+            const value = '; ' + document.cookie;
+            const parts = value.split('; ' + name + '=');
+            if (parts.length === 2) {
+              return parts.pop().split(';').shift();
+            }
+            return null;
+          }
+
+          // Сначала проверяем cookie
+          const cookieTheme = getCookie('theme');
+          if (cookieTheme === 'dark' || cookieTheme === 'light') {
+            document.documentElement.setAttribute('data-theme', cookieTheme);
+            return;
+          }
+
+          // Затем проверяем localStorage (для обратной совместимости)
           const savedTheme = localStorage.getItem('theme');
           if (savedTheme === 'dark' || savedTheme === 'light') {
             document.documentElement.setAttribute('data-theme', savedTheme);

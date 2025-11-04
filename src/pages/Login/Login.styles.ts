@@ -58,29 +58,50 @@ export const headerStyles: SxProps<Theme> = {
   }
 };
 
-export const linkContainerStyles: SxProps<Theme> = {
+export const formContainerStyles: SxProps<Theme> = {
   display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: 1,
-  mt: 3,
-  flexWrap: 'wrap'
+  flexDirection: 'column',
+  gap: 3
 };
 
-export const linkTextStyles: SxProps<Theme> = {
-  color: 'text.secondary',
-  fontSize: '0.875rem'
+export const descriptionStyles: SxProps<Theme> = {
+  mb: 3
 };
 
-export const linkStyles: SxProps<Theme> = {
-  color: 'primary.main',
-  fontSize: '0.875rem',
-  fontWeight: 600,
-  textDecoration: 'none',
-  transition: 'all 0.3s ease-in-out',
-  '&:hover': {
-    color: 'primary.dark',
-    textDecoration: 'underline',
-    transform: 'translateY(-1px)'
+export const textFieldStyles: SxProps<Theme> = {
+  '& .MuiOutlinedInput-root': {
+    borderRadius: 'var(--border-radius-large)',
+    '&:hover .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'var(--color-primary)',
+      boxShadow: 'var(--shadow-glow)'
+    },
+    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+      borderColor: 'var(--color-primary)',
+      boxShadow: 'var(--shadow-glow)'
+    }
   }
 };
+
+export const getButtonStyles = (isMobile: boolean): SxProps<Theme> => ({
+  py: isMobile ? 2 : 1.5,
+  borderRadius: 'var(--border-radius-large)',
+  background: 'var(--gradient-magic)',
+  boxShadow: 'var(--shadow-medium)',
+  fontSize: isMobile ? '1.1rem' : '1rem',
+  fontWeight: 600,
+  textTransform: 'none',
+  transition: 'all 0.3s ease-in-out',
+  '&:hover': {
+    transform: 'translateY(-2px)',
+    boxShadow: 'var(--shadow-glow)',
+    background: 'var(--gradient-sunset)'
+  },
+  '&:active': {
+    transform: 'translateY(0)'
+  },
+  '&:disabled': {
+    background: 'var(--color-disabled)',
+    transform: 'none',
+    boxShadow: 'none'
+  }
+});

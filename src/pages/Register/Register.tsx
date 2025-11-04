@@ -1,27 +1,39 @@
+import './Register.scss';
+
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import {
   Box,
   Button,
   Card,
   CardContent,
   Container,
+  IconButton,
+  InputAdornment,
   TextField,
   Typography,
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { userApi } from '@/api/user.api';
 import { ROUTES } from '@/shared/constants';
+import { toast } from '@/shared/entities';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate';
 import { LocalizedLink } from '@/shared/ui';
+import { useAppDispatch } from '@/store/store';
+import { setUser } from '@/store/user.slice';
 
 import {
   containerStyles,
+  descriptionStyles,
+  formContainerStyles,
   formStyles,
+  getButtonStyles,
   headerStyles,
-  linkContainerStyles,
-  linkStyles,
-  linkTextStyles
+  textFieldStyles
 } from './Register.styles';
 import type { RegisterFormData } from './types';
 
@@ -29,6 +41,8 @@ import type { RegisterFormData } from './types';
  * Страница регистрации пользователя
  */
 const Register: React.FC = () => {
+  const { navigate } = useAppNavigate();
+  const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -37,25 +51,31 @@ const Register: React.FC = () => {
     register,
     handleSubmit,
     watch,
-    formState: { errors, isSubmitting }
+    formState: { errors }
   } = useForm<RegisterFormData>({
     mode: 'onChange'
   });
 
   const password = watch('password');
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      // TODO: Реализовать логику регистрации
-      console.info('Register data:', data);
-
-      // Имитация задержки API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // TODO: Перенаправить на главную страницу после успешной регистрации
-    } catch (error) {
-      console.error('Register error:', error);
-      // TODO: Показать ошибку пользователю
+      setIsLoading(true);
+      const response = await userApi.register({
+        email: data.email,
+        username: data.username,
+        password: data.password
+      });
+      dispatch(setUser(response.user));
+      navigate(ROUTES.catalog);
+    } catch (err: unknown) {
+      const error = err as Error;
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -80,7 +100,7 @@ const Register: React.FC = () => {
                 variant="body1"
                 color="text.secondary"
                 textAlign="center"
-                sx={{ mb: 3 }}
+                sx={descriptionStyles}
               >
                 {t('register_description')}
               </Typography>
@@ -90,7 +110,7 @@ const Register: React.FC = () => {
             <Box
               component="form"
               onSubmit={handleSubmit(onSubmit)}
-              sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}
+              sx={formContainerStyles}
             >
               {/* Email */}
               <TextField
@@ -108,19 +128,7 @@ const Register: React.FC = () => {
                 helperText={errors.email?.message}
                 fullWidth
                 size="medium"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 'var(--border-radius-large)',
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'var(--color-primary)',
-                      boxShadow: 'var(--shadow-glow)'
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'var(--color-primary)',
-                      boxShadow: 'var(--shadow-glow)'
-                    }
-                  }
-                }}
+                sx={textFieldStyles}
               />
 
               {/* Username */}
@@ -146,19 +154,7 @@ const Register: React.FC = () => {
                 helperText={errors.username?.message}
                 fullWidth
                 size="medium"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 'var(--border-radius-large)',
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'var(--color-primary)',
-                      boxShadow: 'var(--shadow-glow)'
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'var(--color-primary)',
-                      boxShadow: 'var(--shadow-glow)'
-                    }
-                  }
-                }}
+                sx={textFieldStyles}
               />
 
               {/* Password */}
@@ -166,29 +162,30 @@ const Register: React.FC = () => {
                 {...register('password', {
                   required: t('form_validation_password_required'),
                   minLength: {
-                    value: 6,
+                    value: 8,
                     message: t('form_validation_password_min_length')
                   }
                 })}
                 label={t('form_password_label')}
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder={t('form_password_placeholder')}
                 error={!!errors.password}
                 helperText={errors.password?.message}
                 fullWidth
                 size="medium"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 'var(--border-radius-large)',
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'var(--color-primary)',
-                      boxShadow: 'var(--shadow-glow)'
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'var(--color-primary)',
-                      boxShadow: 'var(--shadow-glow)'
-                    }
-                  }
+                sx={textFieldStyles}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        tabIndex={-1}
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
                 }}
               />
 
@@ -201,24 +198,25 @@ const Register: React.FC = () => {
                     t('form_validation_confirm_password_mismatch')
                 })}
                 label={t('form_confirm_password_label')}
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder={t('form_confirm_password_placeholder')}
                 error={!!errors.confirmPassword}
                 helperText={errors.confirmPassword?.message}
                 fullWidth
                 size="medium"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 'var(--border-radius-large)',
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'var(--color-primary)',
-                      boxShadow: 'var(--shadow-glow)'
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'var(--color-primary)',
-                      boxShadow: 'var(--shadow-glow)'
-                    }
-                  }
+                sx={textFieldStyles}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        type="button"
+                        tabIndex={-1}
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
                 }}
               />
 
@@ -227,43 +225,33 @@ const Register: React.FC = () => {
                 type="submit"
                 variant="contained"
                 size={isMobile ? 'large' : 'medium'}
-                disabled={isSubmitting}
+                disabled={isLoading}
                 fullWidth
-                sx={{
-                  mt: 2,
-                  py: isMobile ? 2 : 1.5,
-                  borderRadius: 'var(--border-radius-large)',
-                  background: 'var(--gradient-magic)',
-                  boxShadow: 'var(--shadow-medium)',
-                  fontSize: isMobile ? '1.1rem' : '1rem',
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  transition: 'all 0.3s ease-in-out',
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: 'var(--shadow-glow)',
-                    background: 'var(--gradient-sunset)'
-                  },
-                  '&:active': {
-                    transform: 'translateY(0)'
-                  },
-                  '&:disabled': {
-                    background: 'var(--color-disabled)',
-                    transform: 'none',
-                    boxShadow: 'none'
-                  }
-                }}
+                sx={getButtonStyles(isMobile)}
               >
-                {isSubmitting ? t('register_submitting') : t('register_button')}
+                {isLoading ? t('register_submitting') : t('register_button')}
               </Button>
 
               {/* Ссылка на вход */}
-              <Box sx={linkContainerStyles}>
-                <Typography sx={linkTextStyles}>
+              <Box className="register-link-container">
+                <Typography className="register-link-text">
                   {t('register_has_account')}
                 </Typography>
-                <LocalizedLink to={`/${ROUTES.login}`} sx={linkStyles}>
+                <LocalizedLink
+                  to={`/${ROUTES.login}`}
+                  className="register-link"
+                >
                   {t('register_login_link')}
+                </LocalizedLink>
+              </Box>
+
+              {/* Ссылка на каталог */}
+              <Box className="register-continue-container">
+                <LocalizedLink
+                  to={`/${ROUTES.catalog}`}
+                  className="register-continue-link"
+                >
+                  {t('register_continue_without_auth')}
                 </LocalizedLink>
               </Box>
             </Box>

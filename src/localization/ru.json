@@ -318,5 +318,7 @@
   "login_no_account": "Нет аккаунта?",
   "login_register_link": "Зарегистрироваться",
   "register_has_account": "Уже есть аккаунт?",
-  "register_login_link": "Войти"
+  "register_login_link": "Войти",
+  "login_continue_without_auth": "Продолжить просмотр без входа или регистрации",
+  "register_continue_without_auth": "Продолжить просмотр без входа или регистрации"
 }

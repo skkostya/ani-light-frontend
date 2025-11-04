@@ -23,6 +23,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 
+import { userApi } from '@/api/user.api';
 import { ROUTES } from '@/shared/constants';
 import { useAppNavigate } from '@/shared/hooks/useAppNavigate';
 import { isNavigationItemActive } from '@/shared/services/helpers/navigate-helper';
@@ -109,6 +110,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ open, onClose }) => {
 
   const handleLogout = () => {
     dispatch(setUser(undefined));
+    userApi.logout();
     onClose();
   };
 

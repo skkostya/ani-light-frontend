@@ -1,3 +1,5 @@
+import './Login.scss';
+
 import {
   Box,
   Button,
@@ -9,19 +11,26 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { userApi } from '@/api/user.api';
 import { ROUTES } from '@/shared/constants';
+import { toast } from '@/shared/entities';
+import { useAppNavigate } from '@/shared/hooks/useAppNavigate';
 import { LocalizedLink } from '@/shared/ui';
+import { useAppDispatch } from '@/store/store';
+import { setUser } from '@/store/user.slice';
 
 import {
   containerStyles,
+  descriptionStyles,
+  formContainerStyles,
   formStyles,
+  getButtonStyles,
   headerStyles,
-  linkContainerStyles,
-  linkStyles,
-  linkTextStyles
+  textFieldStyles
 } from './Login.styles';
 import type { LoginFormData } from './types';
 
@@ -29,6 +38,8 @@ import type { LoginFormData } from './types';
  * Страница авторизации пользователя
  */
 const Login: React.FC = () => {
+  const { navigate } = useAppNavigate();
+  const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -36,23 +47,25 @@ const Login: React.FC = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting }
+    formState: { errors }
   } = useForm<LoginFormData>({
     mode: 'onChange'
   });
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const onSubmit = async (data: LoginFormData) => {
     try {
-      // TODO: Реализовать логику авторизации
-      console.info('Login data:', data);
-
-      // Имитация задержки API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // TODO: Перенаправить на главную страницу после успешной авторизации
-    } catch (error) {
+      setIsLoading(true);
+      const response = await userApi.login(data);
+      dispatch(setUser(response.user));
+      navigate(ROUTES.catalog);
+    } catch (err: unknown) {
+      const error = err as Error;
       console.error('Login error:', error);
-      // TODO: Показать ошибку пользователю
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -77,7 +90,7 @@ const Login: React.FC = () => {
                 variant="body1"
                 color="text.secondary"
                 textAlign="center"
-                sx={{ mb: 3 }}
+                sx={descriptionStyles}
               >
                 {t('login_description')}
               </Typography>
@@ -87,7 +100,7 @@ const Login: React.FC = () => {
             <Box
               component="form"
               onSubmit={handleSubmit(onSubmit)}
-              sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}
+              sx={formContainerStyles}
             >
               {/* Email */}
               <TextField
@@ -105,19 +118,7 @@ const Login: React.FC = () => {
                 helperText={errors.email?.message}
                 fullWidth
                 size={'medium'}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 'var(--border-radius-large)',
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'var(--color-primary)',
-                      boxShadow: 'var(--shadow-glow)'
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'var(--color-primary)',
-                      boxShadow: 'var(--shadow-glow)'
-                    }
-                  }
-                }}
+                sx={textFieldStyles}
               />
 
               {/* Password */}
@@ -136,19 +137,7 @@ const Login: React.FC = () => {
                 helperText={errors.password?.message}
                 fullWidth
                 size={'medium'}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 'var(--border-radius-large)',
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'var(--color-primary)',
-                      boxShadow: 'var(--shadow-glow)'
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'var(--color-primary)',
-                      boxShadow: 'var(--shadow-glow)'
-                    }
-                  }
-                }}
+                sx={textFieldStyles}
               />
 
               {/* Кнопка входа */}
@@ -156,43 +145,33 @@ const Login: React.FC = () => {
                 type="submit"
                 variant="contained"
                 size={isMobile ? 'large' : 'medium'}
-                disabled={isSubmitting}
+                disabled={isLoading}
                 fullWidth
-                sx={{
-                  mt: 2,
-                  py: isMobile ? 2 : 1.5,
-                  borderRadius: 'var(--border-radius-large)',
-                  background: 'var(--gradient-magic)',
-                  boxShadow: 'var(--shadow-medium)',
-                  fontSize: isMobile ? '1.1rem' : '1rem',
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  transition: 'all 0.3s ease-in-out',
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: 'var(--shadow-glow)',
-                    background: 'var(--gradient-sunset)'
-                  },
-                  '&:active': {
-                    transform: 'translateY(0)'
-                  },
-                  '&:disabled': {
-                    background: 'var(--color-disabled)',
-                    transform: 'none',
-                    boxShadow: 'none'
-                  }
-                }}
+                sx={getButtonStyles(isMobile)}
               >
-                {isSubmitting ? t('login_submitting') : t('login_button')}
+                {isLoading ? t('login_submitting') : t('login_button')}
               </Button>
 
               {/* Ссылка на регистрацию */}
-              <Box sx={linkContainerStyles}>
-                <Typography sx={linkTextStyles}>
+              <Box className="login-link-container">
+                <Typography className="login-link-text">
                   {t('login_no_account')}
                 </Typography>
-                <LocalizedLink to={`/${ROUTES.register}`} sx={linkStyles}>
+                <LocalizedLink
+                  to={`/${ROUTES.register}`}
+                  className="login-link"
+                >
                   {t('login_register_link')}
+                </LocalizedLink>
+              </Box>
+
+              {/* Ссылка на каталог */}
+              <Box className="login-continue-container">
+                <LocalizedLink
+                  to={`/${ROUTES.catalog}`}
+                  className="login-continue-link"
+                >
+                  {t('login_continue_without_auth')}
                 </LocalizedLink>
               </Box>
             </Box>

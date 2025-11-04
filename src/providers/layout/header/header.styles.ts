@@ -53,48 +53,6 @@ export const searchFormStyles: SxProps<Theme> = {
   mx: { xs: 0, md: 2 }
 };
 
-export const searchContainerStyles: SxProps<Theme> = {
-  position: 'relative',
-  backgroundColor: 'var(--color-background-elevated)',
-  borderRadius: 'var(--border-radius-large)',
-  border: '1px solid var(--color-border)',
-  transition: 'all 0.3s ease-in-out',
-  '&:hover': {
-    borderColor: 'primary.main',
-    boxShadow: 'var(--shadow-small)'
-  },
-  '&:focus-within': {
-    borderColor: 'primary.main',
-    boxShadow: 'var(--shadow-glow)'
-  }
-};
-
-export const searchInputContainerStyles: SxProps<Theme> = {
-  padding: '8px 12px',
-  display: 'flex',
-  alignItems: 'center',
-  height: 40
-};
-
-export const searchIconStyles: SxProps<Theme> = {
-  color: 'text.secondary',
-  mr: 1,
-  fontSize: '1.25rem'
-};
-
-export const searchInputStyles: SxProps<Theme> = {
-  flex: 1,
-  color: 'text.primary',
-  '& input': {
-    padding: 0,
-    fontSize: '0.875rem',
-    '&::placeholder': {
-      color: 'text.hint',
-      opacity: 1
-    }
-  }
-};
-
 export const controlsContainerStyles: SxProps<Theme> = {
   display: 'flex',
   alignItems: 'center',
