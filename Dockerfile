@@ -12,6 +12,12 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 COPY . .
+
+ARG PUBLIC_API_URL
+ARG PUBLIC_ANILIBRIA_URL
+ENV PUBLIC_API_URL=${PUBLIC_API_URL}
+ENV PUBLIC_ANILIBRIA_URL=${PUBLIC_ANILIBRIA_URL}
+
 RUN pnpm run build:prod
 
 # ─────────────────────────────────────────────
