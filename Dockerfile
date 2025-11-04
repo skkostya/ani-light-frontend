@@ -12,7 +12,7 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 COPY . .
-RUN pnpm build
+RUN pnpm run build:prod
 
 # ─────────────────────────────────────────────
 # 2) Production stage — NGINX
