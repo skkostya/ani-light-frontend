@@ -1,11 +1,19 @@
 import { Home, Refresh, VideoLibrary } from '@mui/icons-material';
-import { Box, Button, Container, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Container,
+  FormControlLabel,
+  Switch,
+  Typography
+} from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router';
 
 import { episodeApi } from '@/api/episode.api';
 import type { GetNextEpisodeResponse } from '@/api/types/episode.types';
+import { storageApi } from '@/local-storage-api/storage.api';
 import { ROUTES } from '@/shared/constants';
 import { useAppNavigate } from '@/shared/hooks/useAppNavigate';
 import { LocalizedLink, MainLoader } from '@/shared/ui';
@@ -32,6 +40,25 @@ const Anime = () => {
     null
   );
   const [isLoading, setIsLoading] = useState(true);
+
+  // Загружаем настройки из localStorage
+  const [autoSkipOpening, setAutoSkipOpening] = useState(() => {
+    const settings = storageApi.getPlayerSettings();
+    return settings.auto_skip ?? false;
+  });
+
+  const [autoNextEpisode, setAutoNextEpisode] = useState(() => {
+    const settings = storageApi.getPlayerSettings();
+    return settings.auto_next ?? false;
+  });
+
+  // Сохраняем настройки при изменении
+  useEffect(() => {
+    storageApi.updatePlayerSettings({
+      auto_skip: autoSkipOpening,
+      auto_next: autoNextEpisode
+    });
+  }, [autoSkipOpening, autoNextEpisode]);
 
   useEffect(() => {
     if (!alias || !seasonNumber || !episodeNumber) return;
@@ -151,9 +178,60 @@ const Anime = () => {
       data-current-episode-number={episode?.number}
     >
       <Container maxWidth="lg">
+        {/* Toggle переключатели */}
+        <Box sx={animePageStyles.togglesContainer}>
+          {/* Toggle для пропуска опенинга */}
+          <Box sx={animePageStyles.toggleItem}>
+            <Box sx={animePageStyles.toggleLabel}>
+              <Typography sx={animePageStyles.toggleTitle}>
+                {t('anime_player_toggle_skip_opening')}
+              </Typography>
+              <Typography sx={animePageStyles.toggleDescription}>
+                {t('anime_player_toggle_skip_opening_description')}
+              </Typography>
+            </Box>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={autoSkipOpening}
+                  onChange={(e) => setAutoSkipOpening(e.target.checked)}
+                  sx={animePageStyles.toggleSwitch}
+                />
+              }
+              label=""
+            />
+          </Box>
+
+          {/* Toggle для автопереключения серий */}
+          <Box sx={animePageStyles.toggleItem}>
+            <Box sx={animePageStyles.toggleLabel}>
+              <Typography sx={animePageStyles.toggleTitle}>
+                {t('anime_player_toggle_auto_next')}
+              </Typography>
+              <Typography sx={animePageStyles.toggleDescription}>
+                {t('anime_player_toggle_auto_next_description')}
+              </Typography>
+            </Box>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={autoNextEpisode}
+                  onChange={(e) => setAutoNextEpisode(e.target.checked)}
+                  sx={animePageStyles.toggleSwitch}
+                />
+              }
+              label=""
+            />
+          </Box>
+        </Box>
+
         {/* Плеер */}
         <Box sx={animePageStyles.playerContainer}>
-          <AnimePlayer animePageRef={animePageRef} />
+          <AnimePlayer
+            animePageRef={animePageRef}
+            autoSkipOpening={autoSkipOpening}
+            autoNextEpisode={autoNextEpisode}
+          />
         </Box>
 
         {/* Кнопки управления */}

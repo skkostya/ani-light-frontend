@@ -228,5 +228,67 @@ export const animePageStyles = {
         backgroundPosition: '0% 50%'
       }
     }
+  } as SxProps<Theme>,
+
+  togglesContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 1.5,
+    mb: 2,
+    p: 2,
+    maxWidth: '768px',
+    marginInline: 'auto',
+    borderRadius: 'var(--border-radius-medium)',
+    backgroundColor: 'var(--color-background-paper)',
+    border: '1px solid var(--color-border)',
+    boxShadow: 'var(--shadow-small)'
+  } as SxProps<Theme>,
+
+  toggleItem: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 2,
+    p: 1.5,
+    borderRadius: 'var(--border-radius-small)',
+    backgroundColor: 'var(--color-background)',
+    transition: 'all 0.3s ease-in-out',
+    '&:hover': {
+      backgroundColor: 'var(--color-background-hover)'
+    }
+  } as SxProps<Theme>,
+
+  toggleLabel: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 0.5
+  } as SxProps<Theme>,
+
+  toggleTitle: {
+    fontSize: '0.95rem',
+    fontWeight: 600,
+    color: 'var(--color-text-primary)'
+  } as SxProps<Theme>,
+
+  toggleDescription: {
+    fontSize: '0.8rem',
+    color: 'var(--color-text-secondary)',
+    lineHeight: 1.4
+  } as SxProps<Theme>,
+
+  toggleSwitch: {
+    '& .MuiSwitch-switchBase.Mui-checked': {
+      color: 'var(--color-primary)',
+      '&:hover': {
+        backgroundColor: 'rgba(233, 30, 99, 0.08)'
+      }
+    },
+    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+      backgroundColor: 'var(--color-primary)'
+    },
+    '& .MuiSwitch-track': {
+      backgroundColor: 'var(--color-border)'
+    }
   } as SxProps<Theme>
 };
