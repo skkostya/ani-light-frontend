@@ -15,6 +15,8 @@ interface UseInitPlayerProps {
   updateButtonsVisibility: (currentTime: number) => void;
   handleSkipNextPosition: (isFullscreen: boolean) => void;
   addButtonsToLayers: () => void;
+  autoSkipOpening: boolean;
+  autoNextEpisode: boolean;
 }
 
 const useInitPlayer = ({
@@ -23,26 +25,35 @@ const useInitPlayer = ({
   animePageRef,
   updateButtonsVisibility,
   handleSkipNextPosition,
-  addButtonsToLayers
+  addButtonsToLayers,
+  autoSkipOpening,
+  autoNextEpisode
 }: UseInitPlayerProps) => {
   const { t } = useTranslation();
   const { episode } = useAppSelector((state) => state.episode);
 
   const { handleStartWatching, handleMarkEpisodeWatched } = useUserVideo();
   const hlsRef = useRef<Hls | null>(null);
+  const hasSkippedOpeningRef = useRef(false);
 
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showPlaceholder, setShowPlaceholder] = useState(false);
 
   const { episodeId, videoUrl, poster, title, quality } = useMemo(() => {
-    const qualityOptions = [];
+    const qualityOptions: { name: string; url: string; default: boolean }[] =
+      [];
+
+    const currentQuality = storageApi.getPlayerSettings().quality;
 
     if (episode?.video_url_1080) {
       qualityOptions.push({
         name: '1080p',
         url: episode.video_url_1080,
-        default: true
+        default:
+          currentQuality !== undefined
+            ? currentQuality === episode.video_url_1080
+            : true
       });
     }
 
@@ -50,7 +61,10 @@ const useInitPlayer = ({
       qualityOptions.push({
         name: '720p',
         url: episode.video_url_720,
-        default: !episode?.video_url_1080
+        default:
+          currentQuality !== undefined
+            ? currentQuality === episode.video_url_720
+            : !episode?.video_url_1080
       });
     }
 
@@ -58,8 +72,17 @@ const useInitPlayer = ({
       qualityOptions.push({
         name: '480p',
         url: episode.video_url_480,
-        default: !episode?.video_url_1080 && !episode?.video_url_720
+        default:
+          currentQuality !== undefined
+            ? currentQuality === episode.video_url_480
+            : !episode?.video_url_1080 && !episode?.video_url_720
       });
+    }
+
+    const hasDefaultQuality = qualityOptions.some((q) => q.default);
+    if (!hasDefaultQuality && qualityOptions.length > 0) {
+      qualityOptions[0].default = true;
+      storageApi.updatePlayerSettings({ quality: qualityOptions[0].url });
     }
 
     return {
@@ -109,6 +132,9 @@ const useInitPlayer = ({
         onSelect: function (item) {
           if (artPlayerRef.current && 'value' in item) {
             artPlayerRef.current.switchUrl(item.value as string);
+            storageApi.updatePlayerSettings({
+              quality: item.value as string
+            });
           }
           return item.html;
         }
@@ -125,7 +151,7 @@ const useInitPlayer = ({
       url: videoUrl!,
       poster: poster || '',
       title: title,
-      volume: 1,
+      volume: storageApi.getPlayerSettings().volume ?? 1,
       muted: false,
       autoplay: false,
       pip: !mobile, // Отключаем PIP на мобильных устройствах
@@ -333,12 +359,35 @@ const useInitPlayer = ({
             ) {
               artPlayerRef.current.currentTime = watchingTime;
             }
+            // Сбрасываем флаг пропуска опенинга при начале воспроизведения
+            hasSkippedOpeningRef.current = false;
           });
 
           artPlayerRef.current.on('video:timeupdate', () => {
             const newTime = artPlayerRef.current?.currentTime || 0;
             // Обновляем видимость кнопок при изменении времени
             updateButtonsVisibility(newTime);
+
+            // Автоматический пропуск опенинга
+            if (autoSkipOpening && !hasSkippedOpeningRef.current) {
+              const openingStart = playerRef.current?.dataset.openingStart
+                ? Number(playerRef.current?.dataset.openingStart)
+                : null;
+              const openingStop = playerRef.current?.dataset.openingStop
+                ? Number(playerRef.current?.dataset.openingStop)
+                : null;
+
+              if (
+                typeof openingStart === 'number' &&
+                typeof openingStop === 'number' &&
+                newTime >= openingStart &&
+                newTime < openingStop &&
+                artPlayerRef.current
+              ) {
+                artPlayerRef.current.currentTime = openingStop;
+                hasSkippedOpeningRef.current = true;
+              }
+            }
 
             // Сохраняем время просмотра
             if (Math.floor(newTime) % 5 === 0) {
@@ -367,8 +416,18 @@ const useInitPlayer = ({
             if (
               (typeof endingStart === 'number' && newTime >= endingStart) ||
               (totalDuration && newTime >= totalDuration - 10)
-            )
+            ) {
+              // Автоматическое переключение на следующую серию
+              if (autoNextEpisode) {
+                const nextEpisodeButton = document.getElementById(
+                  'next-episode-button'
+                );
+                if (nextEpisodeButton) {
+                  nextEpisodeButton.click();
+                }
+              }
               handleMarkEpisodeWatched(episodeId);
+            }
           });
 
           // Обработчик полноэкранного режима

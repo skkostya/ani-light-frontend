@@ -464,6 +464,10 @@ button {
 }
 
 .art-settings {
+  right: 10px !important;
+  left: auto !important;
+  width: 280px !important;
+
   & .art-setting-item {
     gap: 8px;
   }

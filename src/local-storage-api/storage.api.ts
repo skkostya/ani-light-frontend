@@ -2,6 +2,14 @@ import Cookies from 'universal-cookie';
 
 const cookies = new Cookies(null, { path: '/' });
 
+interface IPlayerSettings {
+  auto_skip?: boolean;
+  auto_next?: boolean;
+  quality?: string;
+  speed?: number;
+  volume?: number;
+}
+
 class StorageApi {
   updateWatchingTime = (data: {
     seasonExternalId: number;
@@ -57,24 +65,36 @@ class StorageApi {
     return time ? Number(time.split('.')[2]) : 0;
   };
 
-  updatePlayerSettings = (settings: {
-    auto_skip: boolean;
-    auto_next: boolean;
-    quality: string;
-    speed: number;
-    volume: number;
-  }) => {
-    const playerSettings = cookies.get('player_settings') || '';
-    const playerSettingsData = playerSettings ? JSON.parse(playerSettings) : {};
-    Object.assign(playerSettingsData, settings);
-    cookies.set('player_settings', JSON.stringify(playerSettingsData), {
-      maxAge: 1000 * 60 * 60 * 24 * 30
-    });
+  updatePlayerSettings = (settings: IPlayerSettings) => {
+    const savedSettings = this.getPlayerSettings();
+    const newSettings = {
+      ...savedSettings,
+      ...settings
+    };
+    for (const [key, value] of Object.entries(newSettings)) {
+      cookies.set(`player_settings.${key}`, value || '', {
+        maxAge: 1000 * 60 * 60 * 24 * 30
+      });
+    }
   };
 
   getPlayerSettings = () => {
-    const playerSettings = cookies.get('player_settings') || '';
-    return playerSettings ? JSON.parse(playerSettings) : {};
+    const settings = {
+      auto_skip: undefined,
+      auto_next: undefined,
+      quality: undefined,
+      speed: undefined,
+      volume: undefined
+    };
+    for (const key of Object.keys(settings)) {
+      const cookieValue = cookies.get(`player_settings.${key}`);
+      settings[key as keyof typeof settings] = cookieValue
+        ? cookieValue === 'undefined'
+          ? undefined
+          : cookieValue
+        : settings[key as keyof typeof settings];
+    }
+    return settings as IPlayerSettings;
   };
 }
 
