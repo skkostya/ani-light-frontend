@@ -67,6 +67,26 @@ const Layout: React.FC = () => {
           </Suspense>
         </ErrorBoundary>
       </main>
+
+      <footer className="layout__footer">
+        <div className="layout__footer-content">
+          <caption className="layout__footer-info">
+            Весь материал на сайте представлен исключительно для домашнего
+            ознакомительного просмотра
+          </caption>
+          <caption className="layout__footer-info">
+            Видео были взяты с сайта{' '}
+            <a
+              className="layout__footer-link"
+              href="https://anilibria.top/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              AniLiberty
+            </a>
+          </caption>
+        </div>
+      </footer>
     </div>
   );
 };

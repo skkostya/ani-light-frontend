@@ -31,7 +31,6 @@ const useInitPlayer = ({
   const { handleStartWatching, handleMarkEpisodeWatched } = useUserVideo();
   const hlsRef = useRef<Hls | null>(null);
 
-  const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showPlaceholder, setShowPlaceholder] = useState(false);
@@ -215,7 +214,6 @@ const useInitPlayer = ({
 
     const initPlayer = async () => {
       try {
-        setIsLoading(true);
         setHasError(false);
 
         // Проверяем валидность URL
@@ -251,7 +249,6 @@ const useInitPlayer = ({
             artPlayerRef.current = player;
           } catch (error) {
             console.error('Failed to create ArtPlayer:', error);
-            setIsLoading(false);
             setHasError(true);
             setErrorMessage('Ошибка инициализации плеера');
             return;
@@ -259,7 +256,6 @@ const useInitPlayer = ({
 
           // Обработчики событий
           artPlayerRef.current.on('ready', () => {
-            setIsLoading(false);
             setShowPlaceholder(false);
 
             // Добавляем кнопки в layers после готовности плеера
@@ -275,7 +271,6 @@ const useInitPlayer = ({
 
           artPlayerRef.current.on('error', (error: unknown) => {
             console.error('Player error:', error);
-            setIsLoading(false);
             setHasError(true);
 
             // Определяем тип ошибки и извлекаем сообщение
@@ -316,22 +311,6 @@ const useInitPlayer = ({
             }
 
             setErrorMessage(errorMessage);
-          });
-
-          artPlayerRef.current.on('loadstart', () => {
-            setIsLoading(true);
-          });
-
-          artPlayerRef.current.on('canplay', () => {
-            setIsLoading(false);
-          });
-
-          artPlayerRef.current.on('loadeddata', () => {
-            setIsLoading(false);
-          });
-
-          artPlayerRef.current.on('waiting', () => {
-            setIsLoading(true);
           });
 
           artPlayerRef.current.on('video:play', () => {
@@ -414,7 +393,6 @@ const useInitPlayer = ({
         }
       } catch (error) {
         console.error('Failed to initialize player:', error);
-        setIsLoading(false);
         setHasError(true);
         setErrorMessage(t('anime_player_error'));
       }
@@ -456,7 +434,6 @@ const useInitPlayer = ({
   };
 
   return {
-    isLoading,
     hasError,
     errorMessage,
     showPlaceholder,

@@ -118,10 +118,13 @@ const AnimeEpisodes = () => {
               >
                 {t('anime_episodes_seasons_title')}
               </Typography>
-              {animeInfo.seasons.map((season) => (
-                <SeasonSection key={season.id} season={season} />
-              ))}
-              <MovieSection movies={animeInfo.movies} />
+              {animeInfo.seasons.length > 0 &&
+                animeInfo.seasons.map((season) => (
+                  <SeasonSection key={season.id} season={season} />
+                ))}
+              {animeInfo.movies.length > 0 && (
+                <MovieSection movies={animeInfo.movies} />
+              )}
             </Box>
           </>
         )}

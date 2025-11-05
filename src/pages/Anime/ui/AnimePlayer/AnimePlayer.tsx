@@ -33,7 +33,7 @@ const AnimePlayer = ({ animePageRef }: AnimePlayerProps) => {
     animePageRef
   });
 
-  const { isLoading, hasError, errorMessage, showPlaceholder, handleRetry } =
+  const { hasError, errorMessage, showPlaceholder, handleRetry } =
     useInitPlayer({
       playerRef,
       artPlayerRef,
@@ -79,16 +79,6 @@ const AnimePlayer = ({ animePageRef }: AnimePlayerProps) => {
           data-total-duration={episode?.duration}
         />
       </Box>
-
-      {/* Overlay загрузки */}
-      {isLoading && (
-        <Box sx={animePlayerStyles.loadingOverlay}>
-          <Box sx={animePlayerStyles.loadingContent}>
-            <Box sx={animePlayerStyles.loadingSpinner} />
-            <Typography variant="h6">{t('anime_player_loading')}</Typography>
-          </Box>
-        </Box>
-      )}
 
       {/* Overlay ошибки */}
       {hasError && (

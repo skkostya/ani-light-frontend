@@ -56,6 +56,26 @@ class StorageApi {
     });
     return time ? Number(time.split('.')[2]) : 0;
   };
+
+  updatePlayerSettings = (settings: {
+    auto_skip: boolean;
+    auto_next: boolean;
+    quality: string;
+    speed: number;
+    volume: number;
+  }) => {
+    const playerSettings = cookies.get('player_settings') || '';
+    const playerSettingsData = playerSettings ? JSON.parse(playerSettings) : {};
+    Object.assign(playerSettingsData, settings);
+    cookies.set('player_settings', JSON.stringify(playerSettingsData), {
+      maxAge: 1000 * 60 * 60 * 24 * 30
+    });
+  };
+
+  getPlayerSettings = () => {
+    const playerSettings = cookies.get('player_settings') || '';
+    return playerSettings ? JSON.parse(playerSettings) : {};
+  };
 }
 
 export const storageApi = new StorageApi();
