@@ -27,7 +27,7 @@ import { userApi } from '@/api/user.api';
 import { ROUTES } from '@/shared/constants';
 import { useAppNavigate } from '@/shared/hooks/useAppNavigate';
 import { isNavigationItemActive } from '@/shared/services/helpers/navigate-helper';
-import { LocalizedLink, ThemeToggle } from '@/shared/ui';
+import { LocalizedLink } from '@/shared/ui';
 import { useAppDispatch, useAppSelector } from '@/store/store';
 import { setUser } from '@/store/user.slice';
 
@@ -35,15 +35,16 @@ import {
   authButtonStyles,
   authButtonsStyles,
   closeButtonStyles,
-  controlsStyles,
   drawerContentStyles,
   drawerStyles,
+  footerStyles,
   headerStyles,
   listItemButtonStyles,
   listItemIconStyles,
   listItemTextStyles,
   listStyles,
-  logoStyles
+  logoStyles,
+  textStyles
 } from './mobile-menu.styles';
 
 interface MobileMenuProps {
@@ -191,12 +192,24 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ open, onClose }) => {
         )}
       </Box>
 
-      {/* Управление */}
-      <Box sx={controlsStyles}>
-        <ThemeToggle size="small" showTooltip={false} />
-
-        {/* TODO английский не поддерживается на сервере */}
-        {/* <LanguageSwitcher size="small" showTooltip={false} /> */}
+      <Box sx={footerStyles}>
+        <Typography variant="caption" sx={textStyles}>
+          Весь материал на сайте представлен исключительно для домашнего
+          ознакомительного просмотра
+        </Typography>
+        <Typography
+          variant="caption"
+          sx={{ ...textStyles, fontSize: '0.85rem', marginTop: '8px' }}
+        >
+          Видео были взяты с сайта{' '}
+          <a
+            href="https://anilibria.top/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            AniLiberty
+          </a>
+        </Typography>
       </Box>
     </Box>
   );

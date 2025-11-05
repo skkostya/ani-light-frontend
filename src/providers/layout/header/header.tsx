@@ -65,10 +65,10 @@ const Header: React.FC = () => {
         </Box>
 
         {/* Правые элементы управления (только на десктопе) */}
-        {!isMobile && (
-          <Box sx={controlsContainerStyles}>
-            <ThemeToggle size="medium" />
-            {isLoggedIn ? (
+        <Box sx={controlsContainerStyles}>
+          <ThemeToggle size="medium" />
+          {!isMobile &&
+            (isLoggedIn ? (
               <IconButton
                 onClick={handleLogout}
                 sx={authIconButtonStyles}
@@ -85,12 +85,11 @@ const Header: React.FC = () => {
               >
                 {t('layout.layout_button_login')}
               </Button>
-            )}
+            ))}
 
-            {/* TODO английский не поддерживается на сервере */}
-            {/* <LanguageSwitcher size="medium" /> */}
-          </Box>
-        )}
+          {/* TODO английский не поддерживается на сервере */}
+          {/* <LanguageSwitcher size="medium" /> */}
+        </Box>
       </Toolbar>
     </AppBar>
   );

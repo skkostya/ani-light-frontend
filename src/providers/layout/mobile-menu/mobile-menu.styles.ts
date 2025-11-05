@@ -90,3 +90,23 @@ export const controlsStyles: SxProps<Theme> = {
   justifyContent: 'center',
   gap: 2
 };
+
+export const footerStyles: SxProps<Theme> = {
+  p: 2,
+  borderTop: '1px solid var(--color-border)'
+};
+
+export const textStyles: SxProps<Theme> = {
+  display: 'block',
+  textAlign: 'center',
+  color: 'text.secondary',
+  '& a': {
+    color: 'text.primary',
+    textDecoration: 'underline',
+    textUnderlineOffset: '2px',
+    transition: 'color 0.3s ease-in-out',
+    '&:hover': {
+      color: 'primary.main'
+    }
+  }
+};

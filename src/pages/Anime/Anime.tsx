@@ -63,6 +63,7 @@ const Anime = () => {
       setIsLoading(false);
     };
     loadEpisode();
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [alias, seasonNumber, episodeNumber]);
 

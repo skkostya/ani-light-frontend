@@ -28,7 +28,7 @@ const LanguageGuard: React.FC<{ children: React.ReactNode }> = ({
       }
       newPath += location.search;
 
-      navigate(newPath, { replace: true });
+      window.location.href = newPath;
     } else if (location.pathname.match(/(^\/\w{2}\/?$)|(^\/$)/)) {
       // Если нет языка в URL, используем сохраненный язык или русский по умолчанию
       const savedLang = localStorage.getItem('i18nextLng');
@@ -37,9 +37,7 @@ const LanguageGuard: React.FC<{ children: React.ReactNode }> = ({
           ? savedLang
           : Languages.ru;
 
-      navigate(`/${defaultLang}/${ROUTES.catalog}`, {
-        replace: true
-      });
+      window.location.href = `/${defaultLang}/${ROUTES.catalog}`;
     } else if (lang && lang !== i18n.language) {
       // Сохраняем язык в localStorage при изменении
       localStorage.setItem('i18nextLng', lang);

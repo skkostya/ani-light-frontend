@@ -11,9 +11,11 @@ export default defineConfig(({ env, command }) => {
   return {
     plugins: [pluginReact(), pluginSass(), pluginSvgr(), pluginNodePolyfill()],
     html: {
-      template: './public/index.html'
+      template: './public/index.html',
+      injectScript: true
     },
     output: {
+      publicPath: '/',
       distPath: {
         root: 'build'
       },

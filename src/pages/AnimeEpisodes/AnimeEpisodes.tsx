@@ -21,6 +21,8 @@ const AnimeEpisodes = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    window.scrollTo({ top: 0 });
+
     const loadAnimeInfo = async () => {
       if (!alias) return;
       const animeInfo = await animeApi.getAnimeReleases(alias);
