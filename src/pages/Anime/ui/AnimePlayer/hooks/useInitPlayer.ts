@@ -38,7 +38,6 @@ const useInitPlayer = ({
   const [showPlaceholder, setShowPlaceholder] = useState(false);
   const eventHandlersRef = useRef<{
     ready?: () => void;
-    ended?: () => void;
     error?: (error: unknown) => void;
     play?: () => void;
     timeupdate?: () => void;
@@ -125,11 +124,6 @@ const useInitPlayer = ({
       handlers.ready = undefined;
     }
 
-    if (handlers.ended) {
-      artPlayerRef.current.off('ended', handlers.ended);
-      handlers.ended = undefined;
-    }
-
     if (handlers.error) {
       artPlayerRef.current.off('error', handlers.error);
       handlers.error = undefined;
@@ -152,14 +146,14 @@ const useInitPlayer = ({
   };
 
   const timeupdateHandler = () => {
-    const newTime = artPlayerRef.current?.currentTime || 0;
-    // Обновляем видимость кнопок при изменении времени
-    updateButtonsVisibility(newTime);
-
     // Предотвращаем излишние вызовы
     const now = Date.now();
     if (now - lastUpdateTimeRef.current < 2500) return;
     lastUpdateTimeRef.current = now;
+
+    const newTime = artPlayerRef.current?.currentTime || 0;
+    // Обновляем видимость кнопок при изменении времени
+    updateButtonsVisibility(newTime);
 
     const autoSkipOpening =
       animePageRef.current?.dataset.autoSkipOpening === 'true';
@@ -201,6 +195,7 @@ const useInitPlayer = ({
     }
 
     if (newTime >= 30) handleStartWatching(episodeId);
+
     const endingStart = playerRef.current?.dataset.endingStart
       ? Number(playerRef.current?.dataset.endingStart)
       : null;
@@ -326,7 +321,6 @@ const useInitPlayer = ({
             });
 
             hlsRef.current.on(Hls.Events.ERROR, (_, data) => {
-              console.error('HLS error:', data);
               if (data.fatal) {
                 switch (data.type) {
                   case Hls.ErrorTypes.NETWORK_ERROR:
@@ -429,12 +423,6 @@ const useInitPlayer = ({
           };
           eventHandlersRef.current.ready = readyHandler;
           artPlayerRef.current.on('ready', readyHandler);
-
-          const endedHandler = () => {
-            handleMarkEpisodeWatched(episodeId);
-          };
-          eventHandlersRef.current.ended = endedHandler;
-          artPlayerRef.current.on('ended', endedHandler);
 
           const errorHandler = (error: unknown) => {
             console.error('Player error:', error);
@@ -570,20 +558,10 @@ const useInitPlayer = ({
 
   useEffect(() => {
     if (artPlayerRef.current && videoUrl) {
-      artPlayerRef.current.off(
-        'video:timeupdate',
-        eventHandlersRef.current.timeupdate
-      );
-      eventHandlersRef.current.timeupdate = undefined;
-
       artPlayerRef.current.switchUrl(videoUrl);
+      artPlayerRef.current.poster = poster || '';
+      artPlayerRef.current.title = title || '';
       addCustomSettings();
-
-      eventHandlersRef.current.timeupdate = timeupdateHandler;
-      artPlayerRef.current.on(
-        'video:timeupdate',
-        eventHandlersRef.current.timeupdate
-      );
     }
   }, [videoUrl]);
 
