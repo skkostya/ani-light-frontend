@@ -16,7 +16,7 @@ export const appBarStyles: SxProps<Theme> = {
 export const toolbarStyles: SxProps<Theme> = {
   minHeight: { xs: 56, md: 64 },
   px: { xs: 0, md: 0 },
-  py: { xs: 1.5, md: 2 },
+  py: { xs: 1, md: 1.5 },
   gap: 2,
   // Ограничиваем ширину и центрируем как контент
   width: 'var(--container-width)',

@@ -7,6 +7,7 @@ import { storageApi } from '@/local-storage-api/storage.api';
 import { useAppSelector } from '@/store/store';
 
 import useUserVideo from '../../../hooks/useUserVideo';
+import { mainEpisodeInfo, timeupdateHandlerHelper } from '../helpers';
 
 interface UseInitPlayerProps {
   playerRef: React.RefObject<HTMLDivElement | null>;
@@ -35,7 +36,6 @@ const useInitPlayer = ({
 
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [showPlaceholder, setShowPlaceholder] = useState(false);
   const eventHandlersRef = useRef<{
     ready?: () => void;
     error?: (error: unknown) => void;
@@ -45,65 +45,15 @@ const useInitPlayer = ({
   }>({});
 
   const { episodeId, videoUrl, poster, title, quality } = useMemo(() => {
-    const qualityOptions: { name: string; url: string; default: boolean }[] =
-      [];
-
-    const currentQuality = storageApi.getPlayerSettings().quality;
-
-    if (episode?.video_url_1080) {
-      qualityOptions.push({
-        name: '1080p',
-        url: episode.video_url_1080,
-        default:
-          currentQuality !== undefined ? currentQuality === '1080p' : true
-      });
-    }
-
-    if (episode?.video_url_720) {
-      qualityOptions.push({
-        name: '720p',
-        url: episode.video_url_720,
-        default:
-          currentQuality !== undefined
-            ? currentQuality === '720p'
-            : !episode?.video_url_1080
-      });
-    }
-
-    if (episode?.video_url_480) {
-      qualityOptions.push({
-        name: '480p',
-        url: episode.video_url_480,
-        default:
-          currentQuality !== undefined
-            ? currentQuality === '480p'
-            : !episode?.video_url_1080 && !episode?.video_url_720
-      });
-    }
-
-    const hasDefaultQuality = qualityOptions.some((q) => q.default);
-    if (!hasDefaultQuality && qualityOptions.length > 0) {
-      qualityOptions[0].default = true;
-      storageApi.updatePlayerSettings({ quality: qualityOptions[0].name });
-    }
-
-    // Выбираем URL на основе сохраненного качества или дефолтного
-    let selectedVideoUrl = episode?.video_url || undefined;
-    const defaultQualityOption = qualityOptions.find((q) => q.default);
-    if (defaultQualityOption) {
-      selectedVideoUrl = defaultQualityOption.url;
-    }
-
-    return {
-      episodeId: episode?.id || '',
-      videoUrl: selectedVideoUrl,
-      poster: episode?.preview_image
-        ? process.env.PUBLIC_ANILIBRIA_URL + episode.preview_image
-        : undefined,
-      title: episode?.animeRelease.title_ru,
-      subtitle: episode?.animeRelease.title_en,
-      quality: qualityOptions
-    };
+    if (!episode)
+      return {
+        episodeId: '',
+        videoUrl: '',
+        poster: '',
+        title: '',
+        quality: []
+      };
+    return mainEpisodeInfo(episode);
   }, [episode]);
 
   // Проверяем, является ли URL HLS потоком
@@ -142,78 +92,6 @@ const useInitPlayer = ({
     if (handlers.fullscreen) {
       artPlayerRef.current.off('fullscreen', handlers.fullscreen);
       handlers.fullscreen = undefined;
-    }
-  };
-
-  const timeupdateHandler = () => {
-    // Предотвращаем излишние вызовы
-    const now = Date.now();
-    if (now - lastUpdateTimeRef.current < 2500) return;
-    lastUpdateTimeRef.current = now;
-
-    const newTime = artPlayerRef.current?.currentTime || 0;
-    // Обновляем видимость кнопок при изменении времени
-    updateButtonsVisibility(newTime);
-
-    const autoSkipOpening =
-      animePageRef.current?.dataset.autoSkipOpening === 'true';
-    // Автоматический пропуск опенинга
-    if (autoSkipOpening && !hasSkippedOpeningRef.current) {
-      const openingStart = playerRef.current?.dataset.openingStart
-        ? Number(playerRef.current?.dataset.openingStart)
-        : null;
-      const openingStop = playerRef.current?.dataset.openingStop
-        ? Number(playerRef.current?.dataset.openingStop)
-        : null;
-
-      if (
-        typeof openingStart === 'number' &&
-        typeof openingStop === 'number' &&
-        newTime >= openingStart &&
-        newTime < openingStop &&
-        artPlayerRef.current
-      ) {
-        artPlayerRef.current.currentTime = openingStop;
-        hasSkippedOpeningRef.current = true;
-      }
-    }
-
-    // Сохраняем время просмотра
-    if (Math.floor(newTime) % 5 === 0) {
-      const seasonExternalId = animePageRef.current?.dataset.seasonExternalId
-        ? Number(animePageRef.current?.dataset.seasonExternalId)
-        : 0;
-      const currentEpisodeNumber = animePageRef.current?.dataset
-        .currentEpisodeNumber
-        ? Number(animePageRef.current?.dataset.currentEpisodeNumber)
-        : 0;
-      storageApi.updateWatchingTime({
-        seasonExternalId: seasonExternalId,
-        episodeNumber: currentEpisodeNumber,
-        watchingTime: Math.floor(newTime)
-      });
-    }
-
-    if (newTime >= 30) handleStartWatching(episodeId);
-
-    const endingStart = playerRef.current?.dataset.endingStart
-      ? Number(playerRef.current?.dataset.endingStart)
-      : null;
-    const totalDuration = Number(playerRef.current?.dataset.totalDuration);
-    if (
-      (typeof endingStart === 'number' && newTime >= endingStart) ||
-      (totalDuration && newTime >= totalDuration - 10)
-    ) {
-      // Автоматическое переключение на следующую серию
-      const autoNextEpisode =
-        animePageRef.current?.dataset.autoNextEpisode === 'true';
-      if (autoNextEpisode) {
-        const nextEpisodeButton = document.getElementById(
-          'next-episode-button'
-        );
-        if (nextEpisodeButton) nextEpisodeButton.click();
-      }
-      handleMarkEpisodeWatched(episodeId);
     }
   };
 
@@ -280,10 +158,6 @@ const useInitPlayer = ({
       autoOrientation: true, // Включаем автоматический поворот экрана
       theme: '#e91e63',
       lang: 'ru',
-      // Управление качеством перенесено в кастомные настройки
-      // Настройки для мобильных устройств - используем стандартные контролы
-      // но скрываем ненужные через CSS
-      // Используем стандартные настройки
       setting: true,
       // Добавляем поддержку HLS
       customType: {
@@ -395,132 +269,140 @@ const useInitPlayer = ({
         }
 
         // Создаем новый экземпляр плеера
-        if (playerRef.current) {
-          const config = createPlayerConfig();
+        if (!playerRef.current) return;
+        const config = createPlayerConfig();
 
-          try {
-            const player = new ArtPlayer(config);
-            artPlayerRef.current = player;
-          } catch (error) {
-            console.error('Failed to create ArtPlayer:', error);
-            setHasError(true);
-            setErrorMessage('Ошибка инициализации плеера');
-            return;
+        try {
+          const player = new ArtPlayer(config);
+          artPlayerRef.current = player;
+        } catch (error) {
+          console.error('Failed to create ArtPlayer:', error);
+          setHasError(true);
+          setErrorMessage('Ошибка инициализации плеера');
+          return;
+        }
+
+        // Очищаем старые обработчики перед добавлением новых
+        cleanupEventHandlers();
+
+        // Обработчики событий - создаем как именованные функции и сохраняем в ref
+        const readyHandler = () => {
+          // Добавляем кнопки в layers после готовности плеера
+          addButtonsToLayers();
+
+          // Добавляем кастомные настройки
+          addCustomSettings();
+        };
+        eventHandlersRef.current.ready = readyHandler;
+        artPlayerRef.current.on('ready', readyHandler);
+
+        const errorHandler = (error: unknown) => {
+          console.error('Player error:', error);
+          setHasError(true);
+
+          // Определяем тип ошибки и извлекаем сообщение
+          let errorMessage = t('anime_player_error');
+
+          if (error instanceof Error) {
+            errorMessage = error.message;
+          } else if (error && typeof error === 'object' && 'type' in error) {
+            // Это DOM Event
+            const event = error as Event;
+            if (event.target && event.target instanceof HTMLVideoElement) {
+              const video = event.target;
+              const mediaError = video.error;
+              if (mediaError) {
+                switch (mediaError.code) {
+                  case MediaError.MEDIA_ERR_ABORTED:
+                    errorMessage = 'Видео было прервано';
+                    break;
+                  case MediaError.MEDIA_ERR_NETWORK:
+                    errorMessage =
+                      'Ошибка сети при загрузке видео. Возможно, проблема с CORS или сервер недоступен';
+                    break;
+                  case MediaError.MEDIA_ERR_DECODE:
+                    errorMessage = 'Ошибка декодирования видео';
+                    break;
+                  case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                    errorMessage = 'Формат видео не поддерживается';
+                    break;
+                  default:
+                    errorMessage = `Ошибка видео: ${
+                      mediaError.message || 'Неизвестная ошибка'
+                    }`;
+                }
+              } else {
+                errorMessage = 'Ошибка загрузки видео';
+              }
+            }
           }
 
-          // Очищаем старые обработчики перед добавлением новых
-          cleanupEventHandlers();
+          setErrorMessage(errorMessage);
+        };
+        eventHandlersRef.current.error = errorHandler;
+        artPlayerRef.current.on('error', errorHandler);
 
-          // Обработчики событий - создаем как именованные функции и сохраняем в ref
-          const readyHandler = () => {
-            setShowPlaceholder(false);
+        const playHandler = () => {
+          const seasonExternalId = animePageRef.current?.dataset
+            .seasonExternalId
+            ? Number(animePageRef.current?.dataset.seasonExternalId)
+            : 0;
+          const currentEpisodeNumber = animePageRef.current?.dataset
+            .currentEpisodeNumber
+            ? Number(animePageRef.current?.dataset.currentEpisodeNumber)
+            : 0;
+          const watchingTime = storageApi.getWatchingTime(
+            seasonExternalId,
+            currentEpisodeNumber
+          );
+          if (
+            watchingTime > 0 &&
+            artPlayerRef.current &&
+            artPlayerRef.current.currentTime === 0
+          ) {
+            artPlayerRef.current.currentTime = watchingTime;
+          }
+          // Сбрасываем флаг пропуска опенинга при начале воспроизведения
+          hasSkippedOpeningRef.current = false;
+        };
+        eventHandlersRef.current.play = playHandler;
+        artPlayerRef.current.on('video:play', playHandler);
 
-            // Добавляем кнопки в layers после готовности плеера
-            addButtonsToLayers();
+        const timeupdateHandler = timeupdateHandlerHelper.bind(null, {
+          episodeId,
+          hasSkippedOpeningRef,
+          artPlayerRef,
+          animePageRef,
+          playerRef,
+          lastUpdateTimeRef,
+          updateButtonsVisibility,
+          handleStartWatching,
+          handleMarkEpisodeWatched
+        });
+        eventHandlersRef.current.timeupdate = timeupdateHandler;
+        artPlayerRef.current.on('video:timeupdate', timeupdateHandler);
 
-            // Добавляем кастомные настройки
-            addCustomSettings();
-          };
-          eventHandlersRef.current.ready = readyHandler;
-          artPlayerRef.current.on('ready', readyHandler);
-
-          const errorHandler = (error: unknown) => {
-            console.error('Player error:', error);
-            setHasError(true);
-
-            // Определяем тип ошибки и извлекаем сообщение
-            let errorMessage = t('anime_player_error');
-
-            if (error instanceof Error) {
-              errorMessage = error.message;
-            } else if (error && typeof error === 'object' && 'type' in error) {
-              // Это DOM Event
-              const event = error as Event;
-              if (event.target && event.target instanceof HTMLVideoElement) {
-                const video = event.target;
-                const mediaError = video.error;
-                if (mediaError) {
-                  switch (mediaError.code) {
-                    case MediaError.MEDIA_ERR_ABORTED:
-                      errorMessage = 'Видео было прервано';
-                      break;
-                    case MediaError.MEDIA_ERR_NETWORK:
-                      errorMessage =
-                        'Ошибка сети при загрузке видео. Возможно, проблема с CORS или сервер недоступен';
-                      break;
-                    case MediaError.MEDIA_ERR_DECODE:
-                      errorMessage = 'Ошибка декодирования видео';
-                      break;
-                    case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
-                      errorMessage = 'Формат видео не поддерживается';
-                      break;
-                    default:
-                      errorMessage = `Ошибка видео: ${
-                        mediaError.message || 'Неизвестная ошибка'
-                      }`;
-                  }
-                } else {
-                  errorMessage = 'Ошибка загрузки видео';
-                }
-              }
+        // Обработчик полноэкранного режима
+        const fullscreenHandler = (isFullscreen: unknown) => {
+          if (isFullscreen) {
+            // Принудительно поворачиваем экран в ландшафт при полноэкранном режиме
+            if (screen.orientation && 'lock' in screen.orientation) {
+              (screen.orientation as ScreenOrientation)
+                .lock('landscape')
+                .catch((err: unknown) => {
+                  console.warn('Could not lock orientation:', err);
+                });
             }
-
-            setErrorMessage(errorMessage);
-          };
-          eventHandlersRef.current.error = errorHandler;
-          artPlayerRef.current.on('error', errorHandler);
-
-          const playHandler = () => {
-            const seasonExternalId = animePageRef.current?.dataset
-              .seasonExternalId
-              ? Number(animePageRef.current?.dataset.seasonExternalId)
-              : 0;
-            const currentEpisodeNumber = animePageRef.current?.dataset
-              .currentEpisodeNumber
-              ? Number(animePageRef.current?.dataset.currentEpisodeNumber)
-              : 0;
-            const watchingTime = storageApi.getWatchingTime(
-              seasonExternalId,
-              currentEpisodeNumber
-            );
-            if (
-              watchingTime > 0 &&
-              artPlayerRef.current &&
-              artPlayerRef.current.currentTime === 0
-            ) {
-              artPlayerRef.current.currentTime = watchingTime;
+          } else {
+            // Разблокируем поворот экрана при выходе из полноэкранного режима
+            if (screen.orientation && 'unlock' in screen.orientation) {
+              (screen.orientation as ScreenOrientation).unlock();
             }
-            // Сбрасываем флаг пропуска опенинга при начале воспроизведения
-            hasSkippedOpeningRef.current = false;
-          };
-          eventHandlersRef.current.play = playHandler;
-          artPlayerRef.current.on('video:play', playHandler);
-
-          eventHandlersRef.current.timeupdate = timeupdateHandler;
-          artPlayerRef.current.on('video:timeupdate', timeupdateHandler);
-
-          // Обработчик полноэкранного режима
-          const fullscreenHandler = (isFullscreen: unknown) => {
-            if (isFullscreen) {
-              // Принудительно поворачиваем экран в ландшафт при полноэкранном режиме
-              if (screen.orientation && 'lock' in screen.orientation) {
-                (screen.orientation as ScreenOrientation)
-                  .lock('landscape')
-                  .catch((err: unknown) => {
-                    console.warn('Could not lock orientation:', err);
-                  });
-              }
-            } else {
-              // Разблокируем поворот экрана при выходе из полноэкранного режима
-              if (screen.orientation && 'unlock' in screen.orientation) {
-                (screen.orientation as ScreenOrientation).unlock();
-              }
-            }
-            handleSkipNextPosition(Boolean(isFullscreen));
-          };
-          eventHandlersRef.current.fullscreen = fullscreenHandler;
-          artPlayerRef.current.on('fullscreen', fullscreenHandler);
-        }
+          }
+          handleSkipNextPosition(Boolean(isFullscreen));
+        };
+        eventHandlersRef.current.fullscreen = fullscreenHandler;
+        artPlayerRef.current.on('fullscreen', fullscreenHandler);
       } catch (error) {
         console.error('Failed to initialize player:', error);
         setHasError(true);
@@ -565,6 +447,27 @@ const useInitPlayer = ({
     }
   }, [videoUrl]);
 
+  useEffect(() => {
+    let isFullscreen = false;
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === 'f' && playerRef.current) {
+        if (!isFullscreen) {
+          playerRef.current?.requestFullscreen();
+          isFullscreen = true;
+          handleSkipNextPosition(true);
+        } else {
+          document.exitFullscreen();
+          isFullscreen = false;
+          handleSkipNextPosition(false);
+        }
+      }
+    };
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
   // Обработка повторной попытки
   const handleRetry = () => {
     setHasError(false);
@@ -582,7 +485,6 @@ const useInitPlayer = ({
   return {
     hasError,
     errorMessage,
-    showPlaceholder,
     handleRetry
   };
 };
