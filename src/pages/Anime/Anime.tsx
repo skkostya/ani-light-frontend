@@ -166,6 +166,10 @@ const Anime = () => {
         seasonNumber: nextSeasonSortOrder ?? seasonNumber ?? undefined
       })
     );
+    storageApi.removeWatchingTime(
+      episode?.animeRelease.external_id,
+      episode?.number
+    );
   };
 
   return (
@@ -176,6 +180,8 @@ const Anime = () => {
       data-next-episode-number={nextEpisode?.nextEpisodeNumber}
       data-season-external-id={episode?.animeRelease.external_id}
       data-current-episode-number={episode?.number}
+      data-auto-skip-opening={autoSkipOpening}
+      data-auto-next-episode={autoNextEpisode}
     >
       <Container maxWidth="lg">
         {/* Toggle переключатели */}
@@ -227,11 +233,7 @@ const Anime = () => {
 
         {/* Плеер */}
         <Box sx={animePageStyles.playerContainer}>
-          <AnimePlayer
-            animePageRef={animePageRef}
-            autoSkipOpening={autoSkipOpening}
-            autoNextEpisode={autoNextEpisode}
-          />
+          <AnimePlayer animePageRef={animePageRef} />
         </Box>
 
         {/* Кнопки управления */}

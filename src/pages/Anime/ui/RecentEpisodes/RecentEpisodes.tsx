@@ -37,7 +37,7 @@ const RecentEpisodes = () => {
       }
     };
     fetchEpisodes();
-  }, []);
+  }, [episodeNumber]);
 
   if (isLoading) return <MainLoader fullWidth />;
   if (episodes.length === 0) return null;

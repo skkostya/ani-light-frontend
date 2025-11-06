@@ -14,15 +14,9 @@ import useSkipNextActions from './hooks/useSkipNextActions';
 
 interface AnimePlayerProps {
   animePageRef: React.RefObject<HTMLDivElement | null>;
-  autoSkipOpening: boolean;
-  autoNextEpisode: boolean;
 }
 
-const AnimePlayer = ({
-  animePageRef,
-  autoSkipOpening,
-  autoNextEpisode
-}: AnimePlayerProps) => {
+const AnimePlayer = ({ animePageRef }: AnimePlayerProps) => {
   const { t } = useTranslation();
   const { episode } = useAppSelector((state) => state.episode);
 
@@ -46,9 +40,7 @@ const AnimePlayer = ({
       animePageRef,
       updateButtonsVisibility,
       handleSkipNextPosition,
-      addButtonsToLayers,
-      autoSkipOpening,
-      autoNextEpisode
+      addButtonsToLayers
     });
 
   // Если нет URL видео, показываем placeholder

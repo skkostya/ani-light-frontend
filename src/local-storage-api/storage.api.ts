@@ -10,6 +10,8 @@ interface IPlayerSettings {
   volume?: number;
 }
 
+const COOKIE_MAX_AGE = 1000 * 60 * 60 * 24 * 30; // 30 дней
+
 class StorageApi {
   updateWatchingTime = (data: {
     seasonExternalId: number;
@@ -46,7 +48,7 @@ class StorageApi {
       watchingTimeData.shift();
     }
     cookies.set('watching_time', watchingTimeData.join('-'), {
-      maxAge: 1000 * 60 * 60 * 24 * 30
+      maxAge: COOKIE_MAX_AGE
     });
   };
 
@@ -65,6 +67,23 @@ class StorageApi {
     return time ? Number(time.split('.')[2]) : 0;
   };
 
+  removeWatchingTime = (seasonExternalId: number, episodeNumber: number) => {
+    const watchingTime = cookies.get('watching_time') || '';
+    const watchingTimeData = watchingTime.split('-') as string[];
+    const newWatchingTimeData = watchingTimeData.filter((time: string) => {
+      const [savedSeasonExternalId, savedEpisodeNumber] = time
+        .split('.')
+        .map(Number);
+      return (
+        seasonExternalId !== savedSeasonExternalId ||
+        episodeNumber !== savedEpisodeNumber
+      );
+    });
+    cookies.set('watching_time', newWatchingTimeData.join('-'), {
+      maxAge: COOKIE_MAX_AGE
+    });
+  };
+
   updatePlayerSettings = (settings: IPlayerSettings) => {
     const savedSettings = this.getPlayerSettings();
     const newSettings = {
@@ -73,7 +92,7 @@ class StorageApi {
     };
     for (const [key, value] of Object.entries(newSettings)) {
       cookies.set(`player_settings.${key}`, value || '', {
-        maxAge: 1000 * 60 * 60 * 24 * 30
+        maxAge: COOKIE_MAX_AGE
       });
     }
   };

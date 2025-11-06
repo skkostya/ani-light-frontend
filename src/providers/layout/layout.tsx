@@ -70,11 +70,11 @@ const Layout: React.FC = () => {
 
       <footer className="layout__footer">
         <div className="layout__footer-content">
-          <caption className="layout__footer-info">
+          <p className="layout__footer-info">
             Весь материал на сайте представлен исключительно для домашнего
             ознакомительного просмотра
-          </caption>
-          <caption className="layout__footer-info">
+          </p>
+          <p className="layout__footer-info">
             Видео были взяты с сайта{' '}
             <a
               className="layout__footer-link"
@@ -84,7 +84,7 @@ const Layout: React.FC = () => {
             >
               AniLiberty
             </a>
-          </caption>
+          </p>
         </div>
       </footer>
     </div>
