@@ -18,14 +18,14 @@ export const animePageStyles = {
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     fontWeight: 700,
-    fontSize: { xs: '1.75rem', sm: '2.25rem', md: '2.75rem' },
+    fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' },
     lineHeight: 1.2,
     mb: 2,
     textShadow: '0 0 20px rgba(233, 30, 99, 0.3)',
     textAlign: 'center',
     '& > p': {
       marginTop: '12px',
-      fontSize: '1.25rem',
+      fontSize: '1.15rem',
       fontWeight: 400,
       color: 'var(--color-text-secondary)',
       textAlign: 'center'
