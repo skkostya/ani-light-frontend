@@ -33,37 +33,14 @@ const AnimePlayer = ({ animePageRef }: AnimePlayerProps) => {
     animePageRef
   });
 
-  const { hasError, errorMessage, showPlaceholder, handleRetry } =
-    useInitPlayer({
-      playerRef,
-      artPlayerRef,
-      animePageRef,
-      updateButtonsVisibility,
-      handleSkipNextPosition,
-      addButtonsToLayers
-    });
-
-  // Если нет URL видео, показываем placeholder
-  if (showPlaceholder) {
-    return (
-      <Box sx={animePlayerStyles.container}>
-        <Box sx={animePlayerStyles.playerPlaceholder}>
-          <Box sx={animePlayerStyles.placeholderContent}>
-            <Typography variant="h4" sx={animePlayerStyles.placeholderTitle}>
-              {t('anime_player_placeholder_title')}
-            </Typography>
-          </Box>
-
-          {/* Декоративные элементы */}
-          <Box sx={animePlayerStyles.decorativeElements}>
-            <Box sx={animePlayerStyles.glowCircle1} />
-            <Box sx={animePlayerStyles.glowCircle2} />
-            <Box sx={animePlayerStyles.glowCircle3} />
-          </Box>
-        </Box>
-      </Box>
-    );
-  }
+  const { hasError, errorMessage, handleRetry } = useInitPlayer({
+    playerRef,
+    artPlayerRef,
+    animePageRef,
+    updateButtonsVisibility,
+    handleSkipNextPosition,
+    addButtonsToLayers
+  });
 
   return (
     <Box sx={animePlayerStyles.container}>

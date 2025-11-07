@@ -1,10 +1,13 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router';
 
 import { userApi } from '@/api/user.api';
 import { getClientToken } from '@/shared/services/user-hash';
 
 const useUserVideo = () => {
   const token = getClientToken();
+  const [searchParams] = useSearchParams();
+  const episodeNumber = searchParams.get('episode');
 
   const markedAsWatching = useRef(false);
   const markedAsWatched = useRef(false);
@@ -30,6 +33,12 @@ const useUserVideo = () => {
     }
     markedAsWatched.current = true;
   };
+
+  useEffect(() => {
+    if (!episodeNumber) return;
+    markedAsWatching.current = false;
+    markedAsWatched.current = false;
+  }, [episodeNumber]);
 
   return {
     markedAsWatching,

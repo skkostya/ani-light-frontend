@@ -41,6 +41,7 @@ const Anime = () => {
   const episodeNumber = searchParams.get('episode');
 
   const animePageRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
 
   const [nextEpisode, setNextEpisode] = useState<GetNextEpisodeResponse | null>(
     null
@@ -96,8 +97,6 @@ const Anime = () => {
       setIsLoading(false);
     };
     loadEpisode();
-
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [alias, seasonNumber, episodeNumber, dispatch]);
 
   // Структурированные данные для SEO
@@ -118,6 +117,11 @@ const Anime = () => {
       episode.animeRelease.title_ru
     );
   }, [episode]);
+
+  useEffect(() => {
+    const top = titleRef.current ? titleRef.current?.offsetTop - 74 : 0;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }, [episode?.id]);
 
   if (!episode) {
     const handleRefresh = () => {
@@ -278,6 +282,13 @@ const Anime = () => {
               />
             </Box>
           </Box>
+
+          <div ref={titleRef}>
+            <Box sx={animePageStyles.title}>
+              {episode.animeRelease.title_ru}
+              <p>{episode.number} серия</p>
+            </Box>
+          </div>
 
           {/* Плеер */}
           <Box sx={animePageStyles.playerContainer}>

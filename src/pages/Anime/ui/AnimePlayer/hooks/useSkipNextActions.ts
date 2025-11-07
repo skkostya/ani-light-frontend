@@ -91,9 +91,10 @@ const useSkipNextActions = ({
       text-transform: none;
     `;
 
-    button.addEventListener('click', () => {
+    button.addEventListener('click', (event: MouseEvent) => {
       const nextEpisodeButton = document.getElementById('next-episode-button');
       if (nextEpisodeButton) {
+        (event.target as HTMLElement).style.display = 'none';
         nextEpisodeButton.click();
       }
     });
@@ -116,47 +117,59 @@ const useSkipNextActions = ({
     if (!artPlayerRef.current) return;
 
     try {
-      const skipButton = skipButtonRef.current;
-      const nextButton = nextButtonRef.current;
+      const autoSkipOpening =
+        animePageRef.current?.dataset.autoSkipOpening === 'true';
+      const autoNextEpisode =
+        animePageRef.current?.dataset.autoNextEpisode === 'true';
 
-      const openingStart = playerRef.current?.dataset.openingStart
-        ? Number(playerRef.current?.dataset.openingStart)
-        : null;
-      const openingStop = playerRef.current?.dataset.openingStop
-        ? Number(playerRef.current?.dataset.openingStop)
-        : null;
-      const endingStart = playerRef.current?.dataset.endingStart
-        ? Number(playerRef.current?.dataset.endingStart)
-        : 0;
-      const totalDuration =
-        Number(playerRef.current?.dataset.totalDuration || 10) - 10;
+      if (!autoSkipOpening) {
+        const skipButton = skipButtonRef.current;
 
-      if (
-        typeof openingStart === 'number' &&
-        typeof openingStop === 'number' &&
-        skipButton &&
-        skipButton instanceof HTMLElement
-      ) {
-        const shouldShowSkip =
-          currentTime >= openingStart && currentTime < openingStop;
-        const display = shouldShowSkip ? 'block' : 'none';
-        if (skipButton.style.display !== display) {
-          skipButton.style.display = display;
+        const openingStart = playerRef.current?.dataset.openingStart
+          ? Number(playerRef.current?.dataset.openingStart)
+          : null;
+        const openingStop = playerRef.current?.dataset.openingStop
+          ? Number(playerRef.current?.dataset.openingStop)
+          : null;
+
+        if (
+          typeof openingStart === 'number' &&
+          typeof openingStop === 'number' &&
+          skipButton &&
+          skipButton instanceof HTMLElement
+        ) {
+          const shouldShowSkip =
+            currentTime >= openingStart && currentTime < openingStop;
+          const display = shouldShowSkip ? 'block' : 'none';
+          if (skipButton.style.display !== display) {
+            skipButton.style.display = display;
+          }
         }
       }
 
-      if (
-        (typeof endingStart === 'number' || totalDuration) &&
-        nextButton &&
-        nextButton instanceof HTMLElement
-      ) {
-        const animePage = animePageRef.current;
-        const nextEpisodeNumber = animePage?.dataset.nextEpisodeNumber;
-        const shouldShowNext =
-          currentTime >= (endingStart || totalDuration) && !!nextEpisodeNumber;
-        const display = shouldShowNext ? 'block' : 'none';
-        if (nextButton.style.display !== display) {
-          nextButton.style.display = display;
+      if (!autoNextEpisode) {
+        const nextButton = nextButtonRef.current;
+
+        const endingStart = playerRef.current?.dataset.endingStart
+          ? Number(playerRef.current?.dataset.endingStart)
+          : 0;
+        const totalDuration =
+          Number(playerRef.current?.dataset.totalDuration || 10) - 10;
+
+        if (
+          (typeof endingStart === 'number' || totalDuration) &&
+          nextButton &&
+          nextButton instanceof HTMLElement
+        ) {
+          const animePage = animePageRef.current;
+          const nextEpisodeNumber = animePage?.dataset.nextEpisodeNumber;
+          const shouldShowNext =
+            currentTime >= (endingStart || totalDuration) &&
+            !!nextEpisodeNumber;
+          const display = shouldShowNext ? 'block' : 'none';
+          if (nextButton.style.display !== display) {
+            nextButton.style.display = display;
+          }
         }
       }
     } catch (error) {

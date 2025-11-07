@@ -87,6 +87,7 @@ const Layout: React.FC = () => {
           </p>
         </div>
       </footer>
+      <div className="layout__footer-placeholder"></div>
     </div>
   );
 };

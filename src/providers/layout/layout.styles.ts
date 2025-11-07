@@ -7,7 +7,6 @@ import type { SxProps, Theme } from '@mui/material';
 export const mainContentStyles: SxProps<Theme> = {
   display: 'flex',
   flexDirection: 'column',
-  minHeight: 'calc(100vh - 64px)', // Высота экрана минус высота шапки
   backgroundColor: 'var(--color-background)',
   pt: { xs: 0, md: 0 }, // Отступ сверху для навигации на десктопе
   pb: { xs: '68px', md: 0 } // Отступ снизу для нижней навигации на мобильных
