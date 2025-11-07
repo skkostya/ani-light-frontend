@@ -4,7 +4,11 @@ import { useSearchParams } from 'react-router';
 import { userApi } from '@/api/user.api';
 import { getClientToken } from '@/shared/services/user-hash';
 
-const useUserVideo = () => {
+interface IProps {
+  animePageRef: React.RefObject<HTMLDivElement | null>;
+}
+
+const useUserVideo = ({ animePageRef }: IProps) => {
   const token = getClientToken();
   const [searchParams] = useSearchParams();
   const episodeNumber = searchParams.get('episode');
@@ -12,9 +16,11 @@ const useUserVideo = () => {
   const markedAsWatching = useRef(false);
   const markedAsWatched = useRef(false);
 
-  const handleStartWatching = async (episodeId: string) => {
+  const handleStartWatching = async () => {
     if (!token || markedAsWatching.current) return;
     try {
+      const episodeId = animePageRef.current?.dataset.currentEpisodeId;
+      if (!episodeId) return;
       await userApi.markEpisodeWatching(episodeId);
     } catch (error) {
       console.error(error);
@@ -22,9 +28,11 @@ const useUserVideo = () => {
     markedAsWatching.current = true;
   };
 
-  const handleMarkEpisodeWatched = async (episodeId: string) => {
+  const handleMarkEpisodeWatched = async () => {
     if (!token || markedAsWatched.current) return;
     try {
+      const episodeId = animePageRef.current?.dataset.currentEpisodeId;
+      if (!episodeId) return;
       await userApi.markEpisodeWatched(episodeId, {
         watched_until_end: true
       });

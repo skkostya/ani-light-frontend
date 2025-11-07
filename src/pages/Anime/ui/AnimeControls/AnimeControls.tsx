@@ -5,25 +5,25 @@ import { useParams, useSearchParams } from 'react-router';
 
 import { ROUTES } from '@/shared/constants';
 import { useAppNavigate } from '@/shared/hooks/useAppNavigate';
-import { useAppSelector } from '@/store/store';
 
 import useUserVideo from '../../hooks/useUserVideo';
 import { animeControlsStyles } from './AnimeControls.styles';
 
-const AnimeControls = ({ onNextEpisode }: { onNextEpisode?: () => void }) => {
+interface IProps {
+  onNextEpisode?: () => void;
+  animePageRef: React.RefObject<HTMLDivElement | null>;
+}
+
+const AnimeControls = ({ onNextEpisode, animePageRef }: IProps) => {
   const { t } = useTranslation();
   const { navigate } = useAppNavigate();
   const { alias } = useParams<{ alias: string }>();
-
-  const { episode } = useAppSelector((state) => state.episode);
 
   const [searchParams] = useSearchParams();
   const seasonNumber = searchParams.get('season');
   const episodeNumber = searchParams.get('episode');
 
-  const currentEpisodeId = episode?.id || '';
-
-  const { handleMarkEpisodeWatched } = useUserVideo();
+  const { handleMarkEpisodeWatched } = useUserVideo({ animePageRef });
 
   const handlePrevious = () => {
     if (Number(episodeNumber) === 1) return;
@@ -37,7 +37,7 @@ const AnimeControls = ({ onNextEpisode }: { onNextEpisode?: () => void }) => {
 
   const handleNext = () => {
     if (!onNextEpisode) return;
-    handleMarkEpisodeWatched(currentEpisodeId);
+    handleMarkEpisodeWatched();
     onNextEpisode();
   };
 

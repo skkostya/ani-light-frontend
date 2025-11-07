@@ -29,7 +29,9 @@ const useInitPlayer = ({
   const { t } = useTranslation();
   const { episode } = useAppSelector((state) => state.episode);
 
-  const { handleStartWatching, handleMarkEpisodeWatched } = useUserVideo();
+  const { handleStartWatching, handleMarkEpisodeWatched } = useUserVideo({
+    animePageRef
+  });
   const hlsRef = useRef<Hls | null>(null);
   const hasSkippedOpeningRef = useRef(false);
   const lastUpdateTimeRef = useRef<number>(0);
@@ -44,10 +46,9 @@ const useInitPlayer = ({
     fullscreen?: (isFullscreen: unknown) => void;
   }>({});
 
-  const { episodeId, videoUrl, poster, title, quality } = useMemo(() => {
+  const { videoUrl, poster, title, quality } = useMemo(() => {
     if (!episode)
       return {
-        episodeId: '',
         videoUrl: '',
         poster: '',
         title: '',
@@ -369,7 +370,6 @@ const useInitPlayer = ({
         artPlayerRef.current.on('video:play', playHandler);
 
         const timeupdateHandler = timeupdateHandlerHelper.bind(null, {
-          episodeId,
           hasSkippedOpeningRef,
           artPlayerRef,
           animePageRef,

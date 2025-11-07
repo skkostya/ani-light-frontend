@@ -232,6 +232,7 @@ const Anime = () => {
         data-next-episode-number={nextEpisode?.nextEpisodeNumber}
         data-season-external-id={episode?.animeRelease.external_id}
         data-current-episode-number={episode?.number}
+        data-current-episode-id={episode?.id}
         data-auto-skip-opening={autoSkipOpening}
         data-auto-next-episode={autoNextEpisode}
       >
@@ -301,6 +302,7 @@ const Anime = () => {
               onNextEpisode={
                 nextEpisode?.nextEpisodeNumber ? handleNextEpisode : undefined
               }
+              animePageRef={animePageRef}
             />
           </Box>
 
