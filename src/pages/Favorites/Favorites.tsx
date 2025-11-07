@@ -4,11 +4,12 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { userApi } from '@/api/user.api';
+import { ROUTES } from '@/shared/constants';
 import { toast } from '@/shared/entities';
 import { AnimeCard } from '@/shared/entities/anime-card';
 import { useIntersectionObserver } from '@/shared/hooks/useIntersectionObserver';
 import { getClientToken } from '@/shared/services/user-hash';
-import { Grid, LoadingIndicator, MainLoader } from '@/shared/ui';
+import { Grid, LoadingIndicator, MainLoader, SEO } from '@/shared/ui';
 
 import { useFavoritesPagination } from './hooks';
 
@@ -115,84 +116,93 @@ const Favorites: React.FC = () => {
   }, [resetAndLoad]);
 
   return (
-    <Container>
-      {isInitialLoading && <MainLoader fullScreen={true} />}
+    <>
+      <SEO
+        title={t('favorites_title')}
+        description={t('favorites_description')}
+        path={`/${ROUTES.favorites}`}
+        noindex={true}
+        nofollow={true}
+      />
+      <Container>
+        {isInitialLoading && <MainLoader fullScreen={true} />}
 
-      <Box sx={{ py: 4 }}>
-        {/* Заголовок */}
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            mb: 3
-          }}
-        >
-          <Typography variant="h3" component="h1" gutterBottom sx={{ mb: 0 }}>
-            {t('favorites_title')}
+        <Box sx={{ py: 4 }}>
+          {/* Заголовок */}
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 3
+            }}
+          >
+            <Typography variant="h3" component="h1" gutterBottom sx={{ mb: 0 }}>
+              {t('favorites_title')}
+            </Typography>
+          </Box>
+
+          <Typography variant="body1" color="text.secondary" paragraph>
+            {t('favorites_description')}
           </Typography>
-        </Box>
 
-        <Typography variant="body1" color="text.secondary" paragraph>
-          {t('favorites_description')}
-        </Typography>
+          {/* Сетка карточек аниме */}
+          {animeList.length > 0 ? (
+            <>
+              <Grid maxColCount={3} minColSize={260} gap={16}>
+                {animeList.map((anime) => (
+                  <AnimeCard
+                    key={anime.id}
+                    anime={anime}
+                    onToggleFavorite={handleToggleFavorite}
+                    onToggleWantToWatch={handleToggleWantToWatch}
+                    variant="compact"
+                  />
+                ))}
+              </Grid>
 
-        {/* Сетка карточек аниме */}
-        {animeList.length > 0 ? (
-          <>
-            <Grid maxColCount={3} minColSize={260} gap={16}>
-              {animeList.map((anime) => (
-                <AnimeCard
-                  key={anime.id}
-                  anime={anime}
-                  onToggleFavorite={handleToggleFavorite}
-                  onToggleWantToWatch={handleToggleWantToWatch}
-                  variant="compact"
-                />
-              ))}
-            </Grid>
-
-            {/* Индикатор загрузки и статус пагинации */}
-            {!isInitialLoading && !pagination.isLoading && (
-              <Box ref={ref}>
-                <LoadingIndicator
-                  isLoading={pagination.isLoading}
-                  hasMore={pagination.hasMore}
-                />
-              </Box>
-            )}
-          </>
-        ) : (
-          /* Пустое состояние */
-          !isInitialLoading && (
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                py: 8,
-                textAlign: 'center'
-              }}
-            >
-              <FavoriteIcon
+              {/* Индикатор загрузки и статус пагинации */}
+              {!isInitialLoading && !pagination.isLoading && (
+                <Box ref={ref}>
+                  <LoadingIndicator
+                    isLoading={pagination.isLoading}
+                    hasMore={pagination.hasMore}
+                  />
+                </Box>
+              )}
+            </>
+          ) : (
+            /* Пустое состояние */
+            !isInitialLoading && (
+              <Box
                 sx={{
-                  fontSize: 64,
-                  color: 'var(--color-text-disabled)',
-                  mb: 2
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  py: 8,
+                  textAlign: 'center'
                 }}
-              />
-              <Typography variant="h5" component="h2" gutterBottom>
-                {t('favorites_empty_title')}
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                {t('favorites_empty_description')}
-              </Typography>
-            </Box>
-          )
-        )}
-      </Box>
-    </Container>
+              >
+                <FavoriteIcon
+                  sx={{
+                    fontSize: 64,
+                    color: 'var(--color-text-disabled)',
+                    mb: 2
+                  }}
+                />
+                <Typography variant="h5" component="h2" gutterBottom>
+                  {t('favorites_empty_title')}
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  {t('favorites_empty_description')}
+                </Typography>
+              </Box>
+            )
+          )}
+        </Box>
+      </Container>
+    </>
   );
 };
 

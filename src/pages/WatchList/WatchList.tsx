@@ -5,11 +5,12 @@ import { useTranslation } from 'react-i18next';
 
 import type { INextUserEpisode } from '@/api/types/user.types';
 import { userApi } from '@/api/user.api';
+import { ROUTES } from '@/shared/constants';
 import { AnimeCard } from '@/shared/entities/anime-card';
 import type { Anime } from '@/shared/entities/anime-card/anime-card.types';
 import { toast } from '@/shared/entities/toast';
 import { getClientToken } from '@/shared/services/user-hash';
-import { Grid, MainLoader } from '@/shared/ui';
+import { Grid, MainLoader, SEO } from '@/shared/ui';
 
 import { NextEpisodeCard } from './ui';
 
@@ -139,95 +140,104 @@ const WatchList: React.FC = () => {
   }, []);
 
   return (
-    <Container>
-      <Box sx={{ py: 4 }}>
-        {/* Заголовок */}
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            mb: 3
-          }}
-        >
-          <Typography variant="h3" component="h1" gutterBottom sx={{ mb: 0 }}>
-            {t('watchlist_title')}
-          </Typography>
-        </Box>
-
-        {!isLoading && nextEpisodes.length > 0 ? (
-          <>
-            <Typography
-              variant="h4"
-              component="h2"
-              gutterBottom
-              sx={{ mb: 3, mt: 4 }}
-            >
-              {t('watchlist_next_episodes_title')}
+    <>
+      <SEO
+        title={t('watchlist_title')}
+        description={t('watchlist_description')}
+        path={`/${ROUTES.watchList}`}
+        noindex={true}
+        nofollow={true}
+      />
+      <Container>
+        <Box sx={{ py: 4 }}>
+          {/* Заголовок */}
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 3
+            }}
+          >
+            <Typography variant="h3" component="h1" gutterBottom sx={{ mb: 0 }}>
+              {t('watchlist_title')}
             </Typography>
-            <Grid maxColCount={3} minColSize={300} gap={16}>
-              {nextEpisodes.map((episode) => (
-                <NextEpisodeCard
-                  key={`${episode.anime_id}-${episode.next_episode.id}`}
-                  episode={episode}
-                  onDelete={() => handleDeleteEpisode(episode.anime_id)}
-                />
-              ))}
-            </Grid>
-            <div style={{ height: 24 }} />
-          </>
-        ) : null}
+          </Box>
 
-        <Typography variant="body1" color="text.secondary" paragraph>
-          {t('watchlist_description')}
-        </Typography>
+          {!isLoading && nextEpisodes.length > 0 ? (
+            <>
+              <Typography
+                variant="h4"
+                component="h2"
+                gutterBottom
+                sx={{ mb: 3, mt: 4 }}
+              >
+                {t('watchlist_next_episodes_title')}
+              </Typography>
+              <Grid maxColCount={3} minColSize={300} gap={16}>
+                {nextEpisodes.map((episode) => (
+                  <NextEpisodeCard
+                    key={`${episode.anime_id}-${episode.next_episode.id}`}
+                    episode={episode}
+                    onDelete={() => handleDeleteEpisode(episode.anime_id)}
+                  />
+                ))}
+              </Grid>
+              <div style={{ height: 24 }} />
+            </>
+          ) : null}
 
-        {/* Сетка карточек аниме */}
-        <div>
-          {isLoading ? (
-            <MainLoader fullWidth />
-          ) : animeList.length > 0 ? (
-            <Grid maxColCount={3} minColSize={260} gap={16}>
-              {animeList.map((anime) => (
-                <AnimeCard
-                  key={anime.id}
-                  anime={anime}
-                  onToggleFavorite={handleToggleFavorite}
-                  onToggleWantToWatch={handleToggleWantToWatch}
-                  variant="compact"
-                />
-              ))}
-            </Grid>
-          ) : (
-            /* Пустое состояние */
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                py: 8,
-                textAlign: 'center'
-              }}
-            >
-              <WatchListIcon
+          <Typography variant="body1" color="text.secondary" paragraph>
+            {t('watchlist_description')}
+          </Typography>
+
+          {/* Сетка карточек аниме */}
+          <div>
+            {isLoading ? (
+              <MainLoader fullWidth />
+            ) : animeList.length > 0 ? (
+              <Grid maxColCount={3} minColSize={260} gap={16}>
+                {animeList.map((anime) => (
+                  <AnimeCard
+                    key={anime.id}
+                    anime={anime}
+                    onToggleFavorite={handleToggleFavorite}
+                    onToggleWantToWatch={handleToggleWantToWatch}
+                    variant="compact"
+                  />
+                ))}
+              </Grid>
+            ) : (
+              /* Пустое состояние */
+              <Box
                 sx={{
-                  fontSize: 64,
-                  color: 'var(--color-text-disabled)',
-                  mb: 2
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  py: 8,
+                  textAlign: 'center'
                 }}
-              />
-              <Typography variant="h5" component="h2" gutterBottom>
-                {t('watchlist_empty_title')}
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                {t('watchlist_empty_description')}
-              </Typography>
-            </Box>
-          )}
-        </div>
-      </Box>
-    </Container>
+              >
+                <WatchListIcon
+                  sx={{
+                    fontSize: 64,
+                    color: 'var(--color-text-disabled)',
+                    mb: 2
+                  }}
+                />
+                <Typography variant="h5" component="h2" gutterBottom>
+                  {t('watchlist_empty_title')}
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  {t('watchlist_empty_description')}
+                </Typography>
+              </Box>
+            )}
+          </div>
+        </Box>
+      </Container>
+    </>
   );
 };
 

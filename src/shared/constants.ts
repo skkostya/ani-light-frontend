@@ -27,3 +27,6 @@ export enum Languages {
   en = 'en'
 }
 export const SUPPORTED_LANGUAGES = [Languages.ru, Languages.en];
+
+// SEO константы
+export const SITE_URL = 'https://anilight.net';
