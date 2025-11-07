@@ -119,20 +119,18 @@ export const timeupdateHandlerHelper = ({
   }
 
   // Сохраняем время просмотра
-  if (Math.floor(newTime) % 5 === 0) {
-    const seasonExternalId = animePageRef.current?.dataset.seasonExternalId
-      ? Number(animePageRef.current?.dataset.seasonExternalId)
-      : 0;
-    const currentEpisodeNumber = animePageRef.current?.dataset
-      .currentEpisodeNumber
-      ? Number(animePageRef.current?.dataset.currentEpisodeNumber)
-      : 0;
-    storageApi.updateWatchingTime({
-      seasonExternalId: seasonExternalId,
-      episodeNumber: currentEpisodeNumber,
-      watchingTime: Math.floor(newTime)
-    });
-  }
+  const seasonExternalId = animePageRef.current?.dataset.seasonExternalId
+    ? Number(animePageRef.current?.dataset.seasonExternalId)
+    : 0;
+  const currentEpisodeNumber = animePageRef.current?.dataset
+    .currentEpisodeNumber
+    ? Number(animePageRef.current?.dataset.currentEpisodeNumber)
+    : 0;
+  storageApi.updateWatchingTime({
+    seasonExternalId: seasonExternalId,
+    episodeNumber: currentEpisodeNumber,
+    watchingTime: Math.floor(newTime)
+  });
 
   if (newTime >= 30) handleStartWatching(episodeId);
 

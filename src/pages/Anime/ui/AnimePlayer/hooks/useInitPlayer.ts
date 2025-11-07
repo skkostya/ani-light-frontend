@@ -444,6 +444,14 @@ const useInitPlayer = ({
       artPlayerRef.current.poster = poster || '';
       artPlayerRef.current.title = title || '';
       addCustomSettings();
+
+      const readyHandler = () => {
+        artPlayerRef.current?.play();
+      };
+      artPlayerRef.current.on('ready', readyHandler);
+      return () => {
+        artPlayerRef.current?.off('ready', readyHandler);
+      };
     }
   }, [videoUrl]);
 
