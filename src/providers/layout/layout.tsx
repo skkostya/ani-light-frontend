@@ -53,7 +53,7 @@ const Layout: React.FC = () => {
               <ErrorTemplate
                 type="oops"
                 redirect={{
-                  text: t('404_redirect-text-2'),
+                  text: t('404_redirect-text-1'),
                   href: ROUTES.catalog
                 }}
               />

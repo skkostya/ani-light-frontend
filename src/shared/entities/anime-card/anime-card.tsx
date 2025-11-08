@@ -94,7 +94,7 @@ export const AnimeCard: React.FC<AnimeCardProps> = ({
         sx={cardStyle}
         style={{
           '--hover-background-color': dominantColor
-            ? `rgba(${dominantColor?.join(',')}, 0.1)`
+            ? `rgba(${dominantColor?.join(',')}, 0.15)`
             : 'var(--color-background-secondary)'
         }}
       >

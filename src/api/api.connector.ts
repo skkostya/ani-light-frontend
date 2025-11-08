@@ -47,12 +47,14 @@ export class ApiConnector {
 
       const statusCode =
         error?.response?.data?.statusCode || error?.response?.status;
-      let message = i18next.t('common.error.base-2');
+      let message = i18next.t('error.base-1');
       if (statusCode && statusCode !== 404 && statusCode < 500) {
         message =
           (typeof error?.response?.data?.message === 'string'
             ? error?.response?.data?.message
-            : error?.response?.data?.message?.message) || message;
+            : Array.isArray(error?.response?.data?.message)
+              ? error?.response?.data?.message.join('\n')
+              : error?.response?.data?.message?.message) || message;
       }
 
       throw {

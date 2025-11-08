@@ -430,6 +430,14 @@ export const CatalogFiltersComponent: React.FC<CatalogFiltersProps> = ({
             >
               {t('button_reset_filters')}
             </Button>
+
+            <Button
+              variant="outlined"
+              onClick={() => setShowFilters(false)}
+              sx={resetButtonStyles}
+            >
+              {t('anime_info_dropdown_close')}
+            </Button>
           </Stack>
         </Box>
       </Collapse>
