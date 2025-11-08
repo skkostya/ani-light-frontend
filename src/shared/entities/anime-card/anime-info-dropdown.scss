@@ -1,7 +1,7 @@
 .anime-info-dropdown {
   position: absolute;
-  top: 8;
-  left: 8;
+  top: 8px;
+  left: 8px;
 
   &__info-button {
     color: white !important;
@@ -12,27 +12,6 @@
     &:hover {
       background-color: rgba(0, 0, 0, 0.7) !important;
       transform: scale(1.1) !important;
-    }
-  }
-
-  &__dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 1000;
-    visibility: hidden;
-    width: min(calc(100vw - 32px), 360px);
-    height: 100%;
-    pointer-events: none;
-    opacity: 0;
-    transition: all 0.3s ease-in-out;
-  }
-
-  &:hover {
-    & .anime-info-dropdown__dropdown {
-      visibility: visible;
-      pointer-events: auto;
-      opacity: 1;
     }
   }
 }

@@ -236,3 +236,18 @@ export const closeButtonStyles: SxProps<Theme> = {
     borderColor: 'var(--color-error-main)'
   }
 };
+
+export const tooltipStyles: SxProps<Theme> = {
+  backgroundColor: 'var(--color-background-paper)',
+  border: '1px solid var(--color-border)',
+  borderRadius: 'var(--border-radius-large)',
+  boxShadow: 'var(--shadow-large)',
+  maxWidth: 'min(calc(100vw - 32px), 360px)',
+  padding: 0,
+  '& .MuiTooltip-arrow': {
+    color: 'var(--color-background-paper)',
+    '&::before': {
+      border: '1px solid var(--color-border)'
+    }
+  }
+};

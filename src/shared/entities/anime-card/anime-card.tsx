@@ -35,6 +35,7 @@ import {
   titleStyles
 } from './anime-card.styles';
 import type { AnimeCardProps } from './anime-card.types';
+import { AnimeInfoDropdown } from './anime-info-dropdown';
 
 /**
  * Компонент карточки аниме
@@ -47,7 +48,9 @@ export const AnimeCard: React.FC<AnimeCardProps> = ({
   variant = 'default'
 }) => {
   const { t } = useTranslation();
-  const [ref, isIntersecting] = useIntersectionObserver();
+  const [ref, isIntersecting] = useIntersectionObserver({
+    rootMargin: '280px'
+  });
   const { ref: imageRef, isIntersecting: imageIsIntersecting } =
     useIntersectionObserver({
       freezeOnceVisible: true
@@ -117,8 +120,8 @@ export const AnimeCard: React.FC<AnimeCardProps> = ({
               />
             </>
           )}
-          {/* TODO: Изменить стилизацию компонента, чтобы дропдаун работал корректно */}
-          {/* <AnimeInfoDropdown anime={anime} /> */}
+
+          <AnimeInfoDropdown anime={anime} />
 
           {/* Кнопка "Хочу посмотреть" */}
           <IconButton
