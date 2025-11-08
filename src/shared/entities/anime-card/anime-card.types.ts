@@ -20,6 +20,7 @@ export interface Anime {
   seasons?: number;
   episodes?: number;
   movies?: number;
+  dominantColor?: string;
 }
 
 export interface AnimeCardProps {

@@ -128,7 +128,8 @@ const WatchList: React.FC = () => {
               year: item.anime.last_year,
               seasons: item.anime.total_releases,
               episodes: item.anime.total_episodes,
-              onGoing: false
+              onGoing: false,
+              dominantColor: item.anime.accent_colors?.[0]?.dominant
             };
           })
         );

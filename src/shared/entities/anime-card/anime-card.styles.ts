@@ -16,7 +16,8 @@ export const cardStyles: SxProps<Theme> = {
   cursor: 'pointer',
   '&:hover': {
     transform: 'translateY(-4px)',
-    boxShadow: 'var(--shadow-large)'
+    boxShadow: 'var(--shadow-large)',
+    backgroundColor: 'var(--hover-background-color)'
   }
 };
 
@@ -30,7 +31,7 @@ export const imageContainerStyles: SxProps<Theme> = {
 };
 
 export const imageStyles: SxProps<Theme> = {
-  width: '100%',
+  maxHeight: '160px',
   height: '100%',
   objectFit: 'cover',
   transition: 'transform 0.3s ease-in-out',

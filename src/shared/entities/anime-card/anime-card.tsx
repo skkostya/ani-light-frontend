@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 
 import { ROUTES } from '@/shared/constants';
 import { useIntersectionObserver } from '@/shared/hooks/useIntersectionObserver';
+import { getRGBFromHex } from '@/shared/services/helpers/DOM';
 import { getPluralForm } from '@/shared/services/helpers/strings';
 import ImageWithFallback from '@/shared/ui/image-with-fallback';
 import { LocalizedLink } from '@/shared/ui/localized-link';
@@ -78,6 +79,8 @@ export const AnimeCard: React.FC<AnimeCardProps> = ({
     : infoOverlayStyles;
   const infoItemStyle = isCompact ? compactInfoItemStyles : infoItemStyles;
 
+  const dominantColor = getRGBFromHex(anime.dominantColor);
+
   return (
     <LocalizedLink
       ref={ref}
@@ -87,15 +90,32 @@ export const AnimeCard: React.FC<AnimeCardProps> = ({
         contentVisibility: isIntersecting ? 'visible' : 'hidden'
       }}
     >
-      <Card sx={cardStyle}>
+      <Card
+        sx={cardStyle}
+        style={{
+          '--hover-background-color': dominantColor
+            ? `rgba(${dominantColor?.join(',')}, 0.1)`
+            : 'var(--color-background-secondary)'
+        }}
+      >
         <Box ref={imageRef} sx={imageContainerStyle}>
           {imageIsIntersecting && (
-            <ImageWithFallback
-              src={anime.imageUrl}
-              alt={anime.title}
-              sx={imageStyles}
-              fallbackIcon="🎬"
-            />
+            <>
+              <img
+                src={`${process.env.PUBLIC_ANILIBRIA_URL}${anime.imageUrl}`}
+                alt={anime.title}
+                className={styles['anime-card__image']}
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+              <ImageWithFallback
+                src={anime.imageUrl}
+                alt={anime.title}
+                sx={imageStyles}
+                fallbackIcon="🎬"
+              />
+            </>
           )}
           {/* TODO: Изменить стилизацию компонента, чтобы дропдаун работал корректно */}
           {/* <AnimeInfoDropdown anime={anime} /> */}

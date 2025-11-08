@@ -75,7 +75,8 @@ export const useFavoritesPagination = () => {
             year: item.anime.last_year,
             seasons: item.anime.total_releases,
             episodes: item.anime.total_episodes,
-            onGoing: isOnGoing
+            onGoing: isOnGoing,
+            dominantColor: item.anime.accent_colors?.[0]?.dominant
           };
         });
 

@@ -76,6 +76,7 @@ const ImageWithFallback = ({
         display: 'flex',
         alignItems: 'center',
         position: 'relative',
+        justifyContent: 'center',
         maxHeight: '100%'
       }}
     >
