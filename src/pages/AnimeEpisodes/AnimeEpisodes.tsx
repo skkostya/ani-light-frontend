@@ -112,6 +112,47 @@ const AnimeEpisodes = () => {
     loadAnimeInfo();
   }, []);
 
+  // Генерируем keywords на основе данных аниме
+  const animeKeywords = useMemo(() => {
+    if (!animeInfo) return undefined;
+
+    const keywords: string[] = [];
+
+    // Добавляем название аниме
+    if (animeInfo.title) {
+      keywords.push(animeInfo.title);
+      keywords.push(`смотреть ${animeInfo.title}`);
+      keywords.push(`${animeInfo.title} онлайн`);
+    }
+
+    // Добавляем оригинальное название, если есть
+    if (
+      animeInfo.originalTitle &&
+      animeInfo.originalTitle !== animeInfo.title
+    ) {
+      keywords.push(animeInfo.originalTitle);
+    }
+
+    // Добавляем жанры
+    if (animeInfo.genres && animeInfo.genres.length > 0) {
+      keywords.push(...animeInfo.genres);
+      keywords.push(
+        ...animeInfo.genres.map((genre) => `аниме ${genre.toLowerCase()}`)
+      );
+    }
+
+    // Добавляем специфичные keywords
+    if (animeInfo.isOnGoing) {
+      keywords.push('онгоинг', 'продолжающееся аниме');
+    }
+
+    if (animeInfo.movies.length > 0) {
+      keywords.push('аниме фильмы');
+    }
+
+    return keywords;
+  }, [animeInfo]);
+
   return (
     <>
       <SEO
@@ -123,6 +164,7 @@ const AnimeEpisodes = () => {
         }
         image={animeInfo?.poster}
         path={`/${ROUTES.animeEpisodes(alias || '')}`}
+        keywords={animeKeywords}
         type="website"
         structuredData={structuredData || undefined}
       />

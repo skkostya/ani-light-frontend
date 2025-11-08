@@ -126,6 +126,16 @@ const Catalog: React.FC = () => {
         title={t('catalog_title')}
         description={t('catalog_description')}
         path={`/${ROUTES.catalog}`}
+        keywords={[
+          'каталог аниме',
+          'поиск аниме',
+          'фильтры аниме',
+          'популярное аниме',
+          'новое аниме',
+          'топ аниме',
+          'аниме по жанрам',
+          'аниме по годам'
+        ]}
         type="website"
         structuredData={structuredData}
       />

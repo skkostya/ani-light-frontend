@@ -63,3 +63,61 @@ export const truncateDescription = (
   }
   return `${description.slice(0, maxLength - 3)}...`;
 };
+
+/**
+ * Генерирует keywords для мета-тега
+ * @param customKeywords - пользовательские keywords (массив строк)
+ * @param lang - язык страницы
+ * @returns Строка с keywords через запятую
+ */
+export const generateKeywords = (
+  customKeywords?: string[],
+  lang: string = 'ru'
+): string => {
+  // Базовые keywords для аниме-сайта
+  const baseKeywords = {
+    ru: [
+      'аниме',
+      'смотреть аниме',
+      'аниме онлайн',
+      'аниме сериалы',
+      'аниме фильмы',
+      'AniLight',
+      'каталог аниме',
+      'просмотр аниме',
+      'аниме бесплатно',
+      'японская анимация',
+      'аниме с русской озвучкой',
+      'аниме с субтитрами',
+      'популярное аниме',
+      'новое аниме',
+      'топ аниме'
+    ],
+    en: [
+      'anime',
+      'watch anime',
+      'anime online',
+      'anime series',
+      'anime movies',
+      'AniLight',
+      'anime catalog',
+      'stream anime',
+      'free anime',
+      'japanese animation',
+      'anime with subtitles',
+      'popular anime',
+      'new anime',
+      'top anime'
+    ]
+  };
+
+  const defaultKeywords = lang === 'en' ? baseKeywords.en : baseKeywords.ru;
+
+  // Объединяем пользовательские keywords с базовыми
+  const allKeywords = customKeywords
+    ? [...customKeywords, ...defaultKeywords]
+    : defaultKeywords;
+
+  // Убираем дубликаты и возвращаем строку
+  return [...new Set(allKeywords)].join(', ');
+};

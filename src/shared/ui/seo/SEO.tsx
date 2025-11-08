@@ -6,6 +6,7 @@ import { useParams } from 'react-router';
 
 import { Languages, SITE_URL } from '@/shared/constants';
 import {
+  generateKeywords,
   getAlternateUrls,
   getCanonicalUrl,
   getImageUrl,
@@ -17,6 +18,7 @@ export interface SEOProps {
   description?: string;
   image?: string;
   path?: string;
+  keywords?: string[];
   noindex?: boolean;
   nofollow?: boolean;
   type?: 'website' | 'article' | 'video';
@@ -37,6 +39,7 @@ export const SEO: React.FC<SEOProps> = (props) => {
       description,
       image,
       path = '',
+      keywords,
       noindex = false,
       nofollow = false,
       type = 'website',
@@ -57,6 +60,9 @@ export const SEO: React.FC<SEOProps> = (props) => {
           defaultValue: 'Сервис для просмотра ваших любимых аниме'
         });
 
+    // Формируем keywords
+    const metaKeywords = generateKeywords(keywords, currentLang);
+
     // Формируем image URL
     const ogImage = image
       ? getImageUrl(image)
@@ -72,6 +78,7 @@ export const SEO: React.FC<SEOProps> = (props) => {
     return {
       title: pageTitle,
       description: metaDescription,
+      keywords: metaKeywords,
       canonicalUrl,
       alternateUrls,
       ogImage,
@@ -86,6 +93,8 @@ export const SEO: React.FC<SEOProps> = (props) => {
       {/* Базовые мета-теги */}
       <title>{seoData.title}</title>
       <meta name="description" content={seoData.description} />
+      <meta name="keywords" content={seoData.keywords} />
+      <meta name="language" content={currentLang} />
       <meta name="robots" content={seoData.robotsContent} />
 
       {/* Канонический URL */}
@@ -100,6 +109,9 @@ export const SEO: React.FC<SEOProps> = (props) => {
       <meta property="og:title" content={seoData.title} />
       <meta property="og:description" content={seoData.description} />
       <meta property="og:image" content={seoData.ogImage} />
+      <meta property="og:image:alt" content={seoData.title} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
       <meta property="og:url" content={seoData.canonicalUrl} />
       <meta property="og:type" content={seoData.ogType} />
       <meta property="og:site_name" content="AniLight" />
@@ -122,6 +134,7 @@ export const SEO: React.FC<SEOProps> = (props) => {
       <meta name="twitter:title" content={seoData.title} />
       <meta name="twitter:description" content={seoData.description} />
       <meta name="twitter:image" content={seoData.ogImage} />
+      <meta name="twitter:image:alt" content={seoData.title} />
 
       {/* Структурированные данные JSON-LD */}
       {seoData.structuredData && (
