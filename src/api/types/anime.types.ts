@@ -18,10 +18,10 @@ export interface IAnime {
   total_duration_in_seconds: number;
   animeReleases: AnimeRelease[];
   userAnime?: UserAnime[];
-  accent_colors?: Array<{
+  accent_colors?: {
     dominant: string;
     palette: string[];
-  }>;
+  };
 }
 
 export interface IAnimeListResponse {

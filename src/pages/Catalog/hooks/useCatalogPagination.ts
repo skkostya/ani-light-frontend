@@ -81,7 +81,7 @@ export const useCatalogPagination = () => {
           seasons: item.total_releases,
           episodes: item.total_episodes,
           onGoing: isOnGoing,
-          dominantColor: item.accent_colors?.[0]?.dominant
+          dominantColor: item.accent_colors?.dominant
         };
       });
 
