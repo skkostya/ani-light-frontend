@@ -2,9 +2,10 @@ import { Box, Container, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ROUTES } from '@/shared/constants';
 import { useIntersectionObserver } from '@/shared/hooks/useIntersectionObserver';
 import { getClientToken } from '@/shared/services/user-hash';
-import { LoadingIndicator, MainLoader } from '@/shared/ui';
+import { LoadingIndicator, MainLoader, SEO } from '@/shared/ui';
 
 import { useHistoryPagination } from './hooks';
 import { HistorySection } from './ui/HistorySection';
@@ -59,65 +60,74 @@ const History: React.FC = () => {
   }, []);
 
   return (
-    <Container>
-      {isInitialLoading && <MainLoader fullScreen={true} />}
+    <>
+      <SEO
+        title={t('history_title')}
+        description={t('history_description')}
+        path={`/${ROUTES.history}`}
+        noindex={true}
+        nofollow={true}
+      />
+      <Container>
+        {isInitialLoading && <MainLoader fullScreen={true} />}
 
-      <Box sx={{ py: 4 }}>
-        {/* Заголовок страницы */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h3" component="h1" gutterBottom sx={{ mb: 0 }}>
-            {t('history_title')}
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            {t('history_description')}
-          </Typography>
-        </Box>
-
-        {/* Список истории по датам */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          {sortedDates.map((date) => (
-            <HistorySection
-              key={date}
-              date={date}
-              entries={groupedHistory[date]}
-            />
-          ))}
-        </Box>
-
-        {/* Индикатор загрузки и статус пагинации */}
-        {sortedDates.length > 0 &&
-          !isInitialLoading &&
-          !pagination.isLoading && (
-            <Box ref={ref}>
-              <LoadingIndicator
-                isLoading={pagination.isLoading}
-                hasMore={pagination.hasMore}
-              />
-            </Box>
-          )}
-
-        {/* Пустое состояние */}
-        {sortedDates.length === 0 && !isInitialLoading && (
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              py: 8,
-              textAlign: 'center'
-            }}
-          >
-            <Typography variant="h5" gutterBottom>
-              {t('history_empty_title')}
+        <Box sx={{ py: 4 }}>
+          {/* Заголовок страницы */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h3" component="h1" gutterBottom sx={{ mb: 0 }}>
+              {t('history_title')}
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              {t('history_empty_description')}
+              {t('history_description')}
             </Typography>
           </Box>
-        )}
-      </Box>
-    </Container>
+
+          {/* Список истории по датам */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            {sortedDates.map((date) => (
+              <HistorySection
+                key={date}
+                date={date}
+                entries={groupedHistory[date]}
+              />
+            ))}
+          </Box>
+
+          {/* Индикатор загрузки и статус пагинации */}
+          {sortedDates.length > 0 &&
+            !isInitialLoading &&
+            !pagination.isLoading && (
+              <Box ref={ref}>
+                <LoadingIndicator
+                  isLoading={pagination.isLoading}
+                  hasMore={pagination.hasMore}
+                />
+              </Box>
+            )}
+
+          {/* Пустое состояние */}
+          {sortedDates.length === 0 && !isInitialLoading && (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                py: 8,
+                textAlign: 'center'
+              }}
+            >
+              <Typography variant="h5" gutterBottom>
+                {t('history_empty_title')}
+              </Typography>
+              <Typography variant="body1" color="text.secondary">
+                {t('history_empty_description')}
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      </Container>
+    </>
   );
 };
 

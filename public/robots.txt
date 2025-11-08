@@ -1,0 +1,36 @@
+# robots.txt для AniLight
+
+# Разрешаем индексацию для всех поисковых систем
+User-agent: *
+Allow: /
+
+# Разрешаем индексацию публичных страниц
+Allow: /ru/anime
+Allow: /en/anime
+Allow: /ru/anime/*
+Allow: /en/anime/*
+
+# Запрещаем индексацию приватных страниц
+Disallow: /ru/login
+Disallow: /en/login
+Disallow: /ru/register
+Disallow: /en/register
+Disallow: /ru/profile
+Disallow: /en/profile
+Disallow: /ru/watch-list
+Disallow: /en/watch-list
+Disallow: /ru/want-list
+Disallow: /en/want-list
+Disallow: /ru/favorites
+Disallow: /en/favorites
+Disallow: /ru/history
+Disallow: /en/history
+
+# Запрещаем индексацию служебных файлов
+Disallow: /api/
+Disallow: /*.json$
+Disallow: /*?*
+
+# Указываем расположение sitemap
+Sitemap: https://anilight.net/sitemap.xml
+

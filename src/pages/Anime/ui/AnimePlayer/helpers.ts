@@ -52,7 +52,6 @@ export const mainEpisodeInfo = (episode: EpisodeDetails) => {
   }
 
   return {
-    episodeId: episode?.id || '',
     videoUrl: selectedVideoUrl,
     poster: episode?.preview_image
       ? process.env.PUBLIC_ANILIBRIA_URL + episode.preview_image
@@ -64,19 +63,17 @@ export const mainEpisodeInfo = (episode: EpisodeDetails) => {
 };
 
 interface TimeupdateHandlerProps {
-  episodeId: string;
   hasSkippedOpeningRef: React.RefObject<boolean>;
   artPlayerRef: React.RefObject<ArtPlayer | null>;
   animePageRef: React.RefObject<HTMLDivElement | null>;
   playerRef: React.RefObject<HTMLDivElement | null>;
   lastUpdateTimeRef: React.RefObject<number>;
   updateButtonsVisibility: (currentTime: number) => void;
-  handleStartWatching: (episodeId: string) => void;
-  handleMarkEpisodeWatched: (episodeId: string) => void;
+  handleStartWatching: () => void;
+  handleMarkEpisodeWatched: () => void;
 }
 
 export const timeupdateHandlerHelper = ({
-  episodeId,
   hasSkippedOpeningRef,
   artPlayerRef,
   animePageRef,
@@ -132,7 +129,7 @@ export const timeupdateHandlerHelper = ({
     watchingTime: Math.floor(newTime)
   });
 
-  if (newTime >= 30) handleStartWatching(episodeId);
+  if (newTime >= 30) handleStartWatching();
 
   const endingStart = playerRef.current?.dataset.endingStart
     ? Number(playerRef.current?.dataset.endingStart)
@@ -149,6 +146,6 @@ export const timeupdateHandlerHelper = ({
       const nextEpisodeButton = document.getElementById('next-episode-button');
       if (nextEpisodeButton) nextEpisodeButton.click();
     }
-    handleMarkEpisodeWatched(episodeId);
+    handleMarkEpisodeWatched();
   }
 };

@@ -1,18 +1,28 @@
 import { Box, Container, Typography } from '@mui/material';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router';
 
 import { userApi } from '@/api/user.api';
+import { ROUTES } from '@/shared/constants';
 import { toast } from '@/shared/entities';
 import { AnimeCard } from '@/shared/entities/anime-card';
 import { useIntersectionObserver } from '@/shared/hooks/useIntersectionObserver';
-import { Grid, LoadingIndicator, MainLoader } from '@/shared/ui';
+import {
+  Grid,
+  LoadingIndicator,
+  MainLoader,
+  SEO,
+  StructuredData,
+  createCollectionPageData
+} from '@/shared/ui';
 
 import { useCatalogPagination } from './hooks/useCatalogPagination';
 import { CatalogFilters as CatalogFiltersComponent } from './ui';
 
 const Catalog: React.FC = () => {
   const { t } = useTranslation();
+  const { lang } = useParams<{ lang: string }>();
 
   const {
     isInitialLoading,
@@ -22,6 +32,13 @@ const Catalog: React.FC = () => {
     resetAndLoad,
     updateAnimeInList
   } = useCatalogPagination();
+
+  // Структурированные данные для SEO
+  const structuredData = createCollectionPageData(
+    t('catalog_title'),
+    t('catalog_description'),
+    lang || 'ru'
+  );
 
   const handleToggleFavorite = useCallback(
     async (animeId: string) => {
@@ -104,58 +121,68 @@ const Catalog: React.FC = () => {
   ]);
 
   return (
-    <Container>
-      {isInitialLoading && <MainLoader fullScreen={true} />}
+    <>
+      <SEO
+        title={t('catalog_title')}
+        description={t('catalog_description')}
+        path={`/${ROUTES.catalog}`}
+        type="website"
+        structuredData={structuredData}
+      />
+      <StructuredData data={structuredData} />
+      <Container>
+        {isInitialLoading && <MainLoader fullScreen={true} />}
 
-      <Box sx={{ py: 4 }}>
-        {/* Заголовок */}
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            mb: 3
-          }}
-        >
-          <Typography variant="h3" component="h1" gutterBottom sx={{ mb: 0 }}>
-            {t('catalog_title')}
+        <Box sx={{ py: 4 }}>
+          {/* Заголовок */}
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 3
+            }}
+          >
+            <Typography variant="h3" component="h1" gutterBottom sx={{ mb: 0 }}>
+              {t('catalog_title')}
+            </Typography>
+          </Box>
+
+          <Typography variant="body1" color="text.secondary" paragraph>
+            {t('catalog_description')}
           </Typography>
-        </Box>
 
-        <Typography variant="body1" color="text.secondary" paragraph>
-          {t('catalog_description')}
-        </Typography>
+          {/* Фильтры */}
+          <CatalogFiltersComponent onApplyFilters={resetAndLoad} />
 
-        {/* Фильтры */}
-        <CatalogFiltersComponent onApplyFilters={resetAndLoad} />
-
-        {/* Сетка карточек аниме */}
-        <Grid maxColCount={3} minColSize={260} gap={16}>
-          {animeList.map((anime) => (
-            <AnimeCard
-              key={anime.id}
-              anime={anime}
-              onToggleFavorite={handleToggleFavorite}
-              onToggleWantToWatch={handleToggleWantToWatch}
-              variant="compact"
-            />
-          ))}
-        </Grid>
-
-        {/* Индикатор загрузки и статус пагинации */}
-        {animeList.length > 0 && !isInitialLoading && (
-          <>
-            <Box>
-              <LoadingIndicator
-                isLoading={pagination.isLoading}
-                hasMore={pagination.hasMore}
+          {/* Сетка карточек аниме */}
+          <Grid maxColCount={3} minColSize={260} gap={16}>
+            {animeList.map((anime) => (
+              <AnimeCard
+                key={anime.id}
+                anime={anime}
+                onToggleFavorite={handleToggleFavorite}
+                onToggleWantToWatch={handleToggleWantToWatch}
+                variant="compact"
               />
-            </Box>
-            {!pagination.isLoading && <Box ref={ref} />}
-          </>
-        )}
-      </Box>
-    </Container>
+            ))}
+          </Grid>
+
+          {/* Индикатор загрузки и статус пагинации */}
+          {animeList.length > 0 && !isInitialLoading && (
+            <>
+              <Box>
+                <LoadingIndicator
+                  isLoading={pagination.isLoading}
+                  hasMore={pagination.hasMore}
+                />
+              </Box>
+              {!pagination.isLoading && <Box ref={ref} />}
+            </>
+          )}
+        </Box>
+      </Container>
+    </>
   );
 };
 
