@@ -18,6 +18,10 @@ export const animeControlsStyles = {
     borderRadius: 'var(--border-radius-large)',
     textTransform: 'none',
     transition: 'all 0.3s ease-in-out',
+    '&:disabled': {
+      opacity: 0.5,
+      cursor: 'not-allowed'
+    },
     '&:hover': {
       transform: 'translateY(-2px)',
       boxShadow: 'var(--shadow-medium)'
