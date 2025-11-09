@@ -114,9 +114,6 @@ const WatchList: React.FC = () => {
         setAnimeList(
           response.map((item) => {
             const release = item.lastWatchedEpisode.animeRelease;
-            const isOnGoing = item.anime.animeReleases.some(
-              (release) => release.is_ongoing
-            );
             const genres =
               release?.animeGenres?.map((genre) => genre.genre.name) || [];
             return {
@@ -132,7 +129,7 @@ const WatchList: React.FC = () => {
               year: item.anime.last_year,
               seasons: item.anime.total_releases,
               episodes: item.anime.total_episodes,
-              onGoing: isOnGoing,
+              onGoing: release?.is_ongoing || false,
               dominantColor: item.anime.accent_colors?.dominant
             };
           })
