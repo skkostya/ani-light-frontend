@@ -29,10 +29,7 @@ export interface LoginDto {
 }
 
 export interface CreateTelegramUserDto {
-  username: string;
-  telegram_id: string;
-  first_name?: string;
-  last_name?: string;
+  temp_token: string;
 }
 
 export interface UserResponse {

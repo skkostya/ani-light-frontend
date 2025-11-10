@@ -1,6 +1,7 @@
 export const ROUTES = {
-  login: 'login',
-  register: 'register',
+  login: 'auth/login',
+  register: 'auth/register',
+  authTelegram: 'auth/telegram',
 
   catalog: 'anime',
   animeEpisodes: (alias = ':alias') => `anime/${alias}`,

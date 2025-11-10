@@ -51,7 +51,7 @@ export const SEO: React.FC<SEOProps> = (props) => {
     const alternateUrls = getAlternateUrls(path);
 
     // Формируем title
-    const pageTitle = title ? `${title} | AniLight` : 'AniLight';
+    const pageTitle = title ? `${title}` : '';
 
     // Формируем description
     const metaDescription = description

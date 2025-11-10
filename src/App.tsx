@@ -7,6 +7,7 @@ import Layout from './providers/layout';
 import { ROUTES } from './shared/constants';
 import NotFound from './shared/widgets/errors/404';
 
+const TelegramAuth = lazy(() => import('./pages/TelegramAuth/TelegramAuth'));
 const Login = lazy(() => import('./pages/Login/Login'));
 const Register = lazy(() => import('./pages/Register/Register'));
 const Catalog = lazy(() => import('./pages/Catalog/Catalog'));
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
           {
             path: ROUTES.register,
             element: <Register />
+          },
+          {
+            path: ROUTES.authTelegram,
+            element: <TelegramAuth />
           },
           {
             element: <Layout />,

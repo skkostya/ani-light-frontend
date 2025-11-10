@@ -55,7 +55,7 @@ class UserApi extends ApiConnector {
    */
   telegramAuth(data: CreateTelegramUserDto): Promise<UserResponse> {
     return this.call<CreateTelegramUserDto, UserResponse>({
-      path: 'auth/telegram',
+      path: 'telegram/auth/exchange',
       method: 'post',
       body: data
     });
