@@ -32,6 +32,10 @@ export interface CreateTelegramUserDto {
   temp_token: string;
 }
 
+export interface TelegramAuthWithInitDataDto {
+  initData: string;
+}
+
 export interface UserResponse {
   user: User;
   message: string;

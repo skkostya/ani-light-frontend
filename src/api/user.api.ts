@@ -12,6 +12,7 @@ import type {
   LoginDto,
   MarkEpisodeWatchedDto,
   ProfileResponse,
+  TelegramAuthWithInitDataDto,
   UpdateAnimeRatingDto,
   UpdateUserAnimeDto,
   UpdateUserEpisodeDto,
@@ -55,6 +56,16 @@ class UserApi extends ApiConnector {
    */
   telegramAuth(data: CreateTelegramUserDto): Promise<UserResponse> {
     return this.call<CreateTelegramUserDto, UserResponse>({
+      path: 'telegram/auth/exchange',
+      method: 'post',
+      body: data
+    });
+  }
+
+  telegramAuthWithInitData(
+    data: TelegramAuthWithInitDataDto
+  ): Promise<UserResponse> {
+    return this.call<TelegramAuthWithInitDataDto, UserResponse>({
       path: 'telegram/auth/exchange',
       method: 'post',
       body: data

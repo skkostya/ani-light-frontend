@@ -7,6 +7,18 @@ import { toast } from '@/shared/entities';
 import { useAppNavigate } from '@/shared/hooks/useAppNavigate';
 import { MainLoader } from '@/shared/ui';
 
+interface TelegramWebApp {
+  initData: string;
+}
+
+declare global {
+  interface Window {
+    Telegram?: {
+      WebApp: TelegramWebApp;
+    };
+  }
+}
+
 const TelegramAuth: React.FC = () => {
   const { navigate } = useAppNavigate();
   const [searchParams] = useSearchParams();
@@ -15,7 +27,7 @@ const TelegramAuth: React.FC = () => {
 
   useEffect(() => {
     const temporaryToken = searchParams.get('temp_token');
-    const autoAuth = searchParams.get('auto_auth');
+    const tgInitData = window.Telegram?.WebApp?.initData;
 
     if (timeout.current === undefined) {
       timeout.current = setTimeout(() => {
@@ -23,14 +35,17 @@ const TelegramAuth: React.FC = () => {
       }, 5000);
     }
 
-    if (!temporaryToken || !autoAuth) return;
+    if (!temporaryToken && !tgInitData) return;
 
     (async () => {
-      if (autoAuth !== 'true') return;
       clearTimeout(timeout.current);
       timeout.current = undefined;
       try {
-        await userApi.telegramAuth({ temp_token: temporaryToken });
+        if (tgInitData) {
+          await userApi.telegramAuthWithInitData({ initData: tgInitData });
+        } else if (temporaryToken) {
+          await userApi.telegramAuth({ temp_token: temporaryToken });
+        }
       } catch {
         toast.error(
           'Ошибка авторизации через Телеграм. Пожалуйста, попробуйте еще раз'
