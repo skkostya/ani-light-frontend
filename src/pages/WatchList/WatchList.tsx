@@ -117,7 +117,7 @@ const WatchList: React.FC = () => {
             const genres =
               release?.animeGenres?.map((genre) => genre.genre.name) || [];
             return {
-              id: item.id,
+              id: item.anime.id,
               alias: item.anime.alias,
               title: item.anime.name,
               originalTitle: item.anime.name_english,

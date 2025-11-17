@@ -9,6 +9,7 @@ export const nextEpisodeCardStyles = {
     transition: 'all 0.3s ease-in-out',
     cursor: 'pointer',
     display: 'flex',
+    height: '100%',
     '&:hover': {
       transform: 'translateY(-2px)',
       boxShadow: 'var(--shadow-large)',
